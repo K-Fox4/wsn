@@ -234,10 +234,7 @@ Ecca::Fitness(Individual &individual) {
 
   total = fitness_alpha_*term1 + fitness_beta_*term2;
 
-  fitness_t fitness_ret = {.total = total,
-                           .term1 = term1,
-                           .term2 = term2,
-                           .coverage_info = coverage_info};
+  fitness_t fitness_ret{total, term1, term2, coverage_info};
 
   individual.SetFitness(fitness_ret);
 

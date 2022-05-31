@@ -24,30 +24,30 @@ import math
 # for convenience, the scenarios list also accepts commands that are
 # executed in run.py
 
-scenario0 = ('DC',    None,              'zero',  None)
-scenario1 = ('LEACH', None,              'zero',  None)
-scenario2 = ('MTE',   None,              'total', None)
-scenario3 = ('FCM',   None,              'zero',  None)
-scenario4 = ('FCM',  'ModifiedPso',      'zero',  'FCMMPSO')
-scenario5 = ('FCM',  'Pso',              'zero',  None)
-scenario6 = ('FCM',  'Ecca',             'zero',  'ECCA')
-scenario7 = ('FCM',  'GeneticAlgorithm', 'zero',  None)
-scenario31 = ('FCM',   None,              'zero',  'BS at (125,125)')
-scenario32 = ('FCM',   None,              'zero',  'BS at (65,65)')
-scenario33 = ('FCM',   None,              'zero',  'BS at (0,0)')
-scenario34 = ('FCM',   None,              'zero',  'BS at (-65,-65)')
+scenario0 = ('DC', None, 'zero', None)
+scenario1 = ('LEACH', None, 'zero', "LEACH")
+scenario2 = ('MTE', None, 'total', None)
+scenario3 = ('FCM', None, 'zero', None)
+scenario4 = ('FCM', 'ModifiedPso', 'zero', 'FCMMPSO')
+scenario5 = ('FCM', 'Pso', 'zero', None)
+scenario6 = ('FCM', 'Ecca', 'zero', 'ECCA')
+scenario7 = ('FCM', 'GeneticAlgorithm', 'zero', None)
+scenario31 = ('FCM', None, 'zero', 'BS at (125,125)')
+scenario32 = ('FCM', None, 'zero', 'BS at (65,65)')
+scenario33 = ('FCM', None, 'zero', 'BS at (0,0)')
+scenario34 = ('FCM', None, 'zero', 'BS at (-65,-65)')
 # list with all scenarios to simulate
 
 # example of configuration to get first part of results
-#scenarios = [
+# scenarios = [
 #              "cf.FITNESS_ALPHA=0.5",
 #              "cf.FITNESS_BETA=0.5",
-              #scenario3,
+# scenario3,
 #              "plot_clusters(network)",
 #              scenario0,
-              #scenario1,
-              #scenario2,
-              #scenario5,
+# scenario1,
+# scenario2,
+# scenario5,
 #              scenario4,
 #              "plot_time_of_death(network)",
 #              "plot_traces(traces)",
@@ -61,18 +61,18 @@ scenario34 = ('FCM',   None,              'zero',  'BS at (-65,-65)')
 #              "save2csv(traces)",
 #            ]
 
-scenarios = [
-              "cf.FITNESS_ALPHA=0.7",
-              "cf.FITNESS_BETA=0.3",
+# scenarios = [
+#               "cf.FITNESS_ALPHA=0.7",
+#               "cf.FITNESS_BETA=0.3",
 #              scenario0,
 #              scenario1,
 #              scenario2,
 #              scenario3,
-              scenario4,
+#               scenario4,
 #              "cf.FITNESS_ALPHA=0.34",
 #              "cf.FITNESS_BETA=0.33",
 #              "cf.FITNESS_GAMMA=0.33",
-              scenario6,
+#               scenario6,
 #              scenario6,
 #              #'cf.BS_POS_X=65.0',
 #              #'cf.BS_POS_Y=65.0',
@@ -83,11 +83,11 @@ scenarios = [
 #              #'cf.BS_POS_X=-65.0',
 #              #'cf.BS_POS_Y=-65.0',
 #              #scenario34,
-              "save2csv_raw(traces)",
-              "plot_traces(traces)",
-            ]
+#               "save2csv_raw(traces)",
+#               "plot_traces(traces)",
+#             ]
 
-#scenarios = [
+# scenarios = [
 #              "cf.FITNESS_ALPHA=0.5",
 #              "cf.FITNESS_BETA=0.5",
 #              scenario4,
@@ -116,78 +116,97 @@ scenarios = [
 #              "save2csv(traces)",
 #            ]
 
-## tracer options
-TRACE_ENERGY         = 0
-TRACE_ALIVE_NODES    = 1
-TRACE_COVERAGE       = 1
+scenarios = [
+    # scenario0,
+    scenario1,
+    # scenario2,
+    "save2csv_raw(traces)",
+    "plot_traces(traces)",
+    "plot_time_of_death(network)",
+]
+
+# Tracer options
+TRACE_ENERGY = 0
+TRACE_ALIVE_NODES = 1
+TRACE_COVERAGE = 1
 TRACE_LEARNING_CURVE = 0
 
-## Runtime configuration
+# Runtime configuration
 MAX_ROUNDS = 15000
+
 # number of transmissions of sensed information to cluster heads or to
 # base station (per round)
 MAX_TX_PER_ROUND = 1
 
 NOTIFY_POSITION = 0
 
-## Network configurations:
+# Network configurations:
 # number of nodes
-NB_NODES = 300
+NB_NODES = 1000
+
 # node sensor range
-COVERAGE_RADIUS = 15 # meters 
+COVERAGE_RADIUS = 15  # meters
+
 # node transmission range
-TX_RANGE = 30 # meters
+TX_RANGE = 30  # meters
 BSID = -1
+
 # area definition
 AREA_WIDTH = 250.0
 AREA_LENGTH = 250.0
+
 # base station position
 BS_POS_X = 125.0
 BS_POS_Y = 125.0
+
 # packet configs
-MSG_LENGTH = 4000 # bits
-HEADER_LENGTH = 150 # bits
+MSG_LENGTH = 4000  # bits
+HEADER_LENGTH = 150  # bits
+
 # initial energy at every node's battery
-INITIAL_ENERGY = 2 # Joules
+INITIAL_ENERGY = 2  # Joules
 
-
-## Energy Configurations
+# Energy Configurations
 # energy dissipated at the transceiver electronic (/bit)
-E_ELEC = 50e-9 # Joules
+E_ELEC = 50e-9  # Joules
+
 # energy dissipated at the data aggregation (/bit)
-E_DA = 5e-9 # Joules
+E_DA = 5e-9  # Joules
+
 # energy dissipated at the power amplifier (supposing a multi-path
 # fading channel) (/bin/m^4)
-E_MP = 0.0013e-12 # Joules
+E_MP = 0.0013e-12  # Joules
+
 # energy dissipated at the power amplifier (supposing a line-of-sight
 # free-space channel (/bin/m^2)
-E_FS = 10e-12 # Joules
-THRESHOLD_DIST = math.sqrt(E_FS/E_MP) # meters
+E_FS = 10e-12  # Joules
 
+THRESHOLD_DIST = math.sqrt(E_FS / E_MP)  # meters
 
-## Routing configurations:
+# Routing configurations:
 NB_CLUSTERS = 5
+
 # FCM fuzzyness coeficient
 FUZZY_M = 2
 
-
-## Sleep Scheduling configurations:
+# Sleep Scheduling configurations:
 NB_INDIVIDUALS = 10
 MAX_ITERATIONS = 50
+
 # ALPHA and BETA are the fitness function' weights
 # where ALPHA optimizes energy lifetime, BETA the coverage
-FITNESS_ALPHA  = 0.34
-FITNESS_BETA   = 0.33
-FITNESS_GAMMA  = 0.33
+FITNESS_ALPHA = 0.34
+FITNESS_BETA = 0.33
+FITNESS_GAMMA = 0.33
 WMAX = 0.6
 WMIN = 0.1
 
-
-## Other configurations:
+# Other configurations:
 # grid precision (the bigger the faster the simulation)
-GRID_PRECISION = 1 # in meters
+GRID_PRECISION = 1  # in meters
+
 # useful constants (for readability)
 INFINITY = float('inf')
 MINUS_INFINITY = float('-inf')
 
-RESULTS_PATH = './results/'
+RESULTS_PATH = 'results/'
