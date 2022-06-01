@@ -8,7 +8,7 @@ class Tracer(dict):
         rounds_label = 'Rounds'
 
         # every tuple has a y-axis label, x-axis label, list with values,
-        # boolean that indicates if it is plotable and if is printable
+        # boolean that indicates if it is plottable and if is printable
 
         # lifetime/energy-related log
         self['alive_nodes'] = ('Number of alive nodes', rounds_label, [], 1, 0)
@@ -19,7 +19,7 @@ class Tracer(dict):
         self['30per_depletion'] = ('30 percent depletion', rounds_label, [], 0, 0)
 
         # coverage-related log
-        self['coverage'] = ('Coverate rate', rounds_label, [], 0, 1)
+        self['coverage'] = ('Coverage rate', rounds_label, [], 0, 1)
         self['overlapping'] = ('Overlapping rate', rounds_label, [], 0, 1)
         self['nb_sleeping'] = ('% of sleeping nodes', rounds_label, [], 0, 1)
 

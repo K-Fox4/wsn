@@ -1,5 +1,6 @@
 import config as cf
 import logging
+import csv
 from python.network.node import *
 from python.utils.grid import *
 import matplotlib.pyplot as plt
@@ -35,6 +36,8 @@ class Network(list):
         #       implement a method for calculating k-coverage
         #       nodes for every round and update it
 
+        self.k_coverage_nodes = []
+
         self._dict = {}
         for node in self:
             self._dict[node.id] = node
@@ -42,8 +45,11 @@ class Network(list):
         self.perform_two_level_comm = 1
         self.round = 0
         self.centroids = []
+
         self.routing_protocol = None
         self.sleep_scheduler_class = None
+        self._sleep_scheduler = None
+        self.deaths_this_round = None
 
         self.initial_energy = self.get_remaining_energy()
         self.first_depletion = 0
@@ -73,7 +79,7 @@ class Network(list):
         self.per30_depletion = 0
         self.perform_two_level_comm = 1
 
-    def simulate(self):
+    def simulate(self, k_coverage_approach):
         tracer = Tracer()
 
         self.routing_protocol.pre_communication(self)
@@ -92,8 +98,11 @@ class Network(list):
             #       function
 
             self.round = round_nb
-            print_args = (round_nb, self.get_remaining_energy())
+            current_remaining_energy = self.get_remaining_energy()
+
+            print_args = (round_nb, current_remaining_energy)
             print("round %d: total remaining energy: %f" % print_args)
+
             nb_alive_nodes = self.count_alive_nodes()
             if nb_alive_nodes == 0:
                 break
@@ -103,7 +112,7 @@ class Network(list):
 
             if self.sleep_scheduler_class:
                 log = self._sleep_scheduler.schedule()
-                for key, value in log.iteritems():
+                for key, value in log.items():
                     tracer[key][2].append(value)
 
             self.routing_protocol.setup_phase(self, round_nb)
@@ -244,9 +253,10 @@ class Network(list):
         return self[-1]
 
     def get_node(self, id):
-        """By default, we assume that the id is equal to the node's posi-
-    tion in the list, but that may not be always the case.
-    """
+        """
+        By default, we assume that the id is equal to the node's
+        position in the list, but that may not be always the case.
+        """
         return self._dict[id]
 
     def notify_position(self):
@@ -268,13 +278,13 @@ class Network(list):
 
     def get_remaining_energy(self, ignore_nodes=None):
         """Returns the sum of the remaining energies at all nodes."""
-        set = self.get_alive_nodes()
-        if len(set) == 0:
+        set_of_nodes = self.get_alive_nodes()
+        if len(set_of_nodes) == 0:
             return 0
         if ignore_nodes:
-            set = [node for node in set if node not in ignore_nodes]
+            set_of_nodes = [node for node in set_of_nodes if node not in ignore_nodes]
         transform = lambda x: x.energy_source.energy
-        energies = [transform(x) for x in set]
+        energies = [transform(x) for x in set_of_nodes]
         return sum(x for x in energies)
 
     def set_aggregation_function(self, function):
@@ -356,7 +366,8 @@ class Network(list):
             ax.scatter(base_station_x_coord, base_station_y_coord, color='b', marker='h', s=80, label='Sink')
 
             # Set the plot attributes
-            ax.legend(bbox_to_anchor=(1.0, 1.0), loc='upper left', fontsize=11)
+            ax.legend(bbox_to_anchor=(1.05, 1.0), loc='upper left', fontsize=11, borderaxespad=0.)
+            # ax.legend(loc='best', fontsize=11)
             plt.tight_layout()
             plt.gca().set_aspect('equal', adjustable='box')
             plt.xlim(xmin=0, xmax=cf.AREA_WIDTH)

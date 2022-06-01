@@ -116,17 +116,22 @@ scenario34 = ('FCM', None, 'zero', 'BS at (-65,-65)')
 #              "save2csv(traces)",
 #            ]
 
+"""k-coverage protocols"""
+
+# k-CSqu protocol of square tessellation
+leach_kcsqu = ('LEACH', None, 'zero', "LEACH", ("square", 3))
+
+# DIRACCk protocol of Reuleaux triangle tessellation
+leach_diracck = ('LEACH', None, 'zero', "LEACH", ("triangle", 3))
+
 scenarios = [
-    # scenario0,
-    scenario1,
-    # scenario2,
-    "save2csv_raw(traces)",
+    leach_kcsqu,
     "plot_traces(traces)",
     "plot_time_of_death(network)",
 ]
 
 # Tracer options
-TRACE_ENERGY = 0
+TRACE_ENERGY = 1
 TRACE_ALIVE_NODES = 1
 TRACE_COVERAGE = 1
 TRACE_LEARNING_CURVE = 0
@@ -134,7 +139,8 @@ TRACE_LEARNING_CURVE = 0
 # Runtime configuration
 MAX_ROUNDS = 15000
 
-# number of transmissions of sensed information to cluster heads or to
+# number of transmissions of sensed information
+# to cluster heads or to
 # base station (per round)
 MAX_TX_PER_ROUND = 1
 
@@ -164,7 +170,7 @@ MSG_LENGTH = 4000  # bits
 HEADER_LENGTH = 150  # bits
 
 # initial energy at every node's battery
-INITIAL_ENERGY = 2  # Joules
+INITIAL_ENERGY = 15  # Joules
 
 # Energy Configurations
 # energy dissipated at the transceiver electronic (/bit)
@@ -186,7 +192,7 @@ THRESHOLD_DIST = math.sqrt(E_FS / E_MP)  # meters
 # Routing configurations:
 NB_CLUSTERS = 5
 
-# FCM fuzzyness coeficient
+# FCM fuzziness coefficient
 FUZZY_M = 2
 
 # Sleep Scheduling configurations:

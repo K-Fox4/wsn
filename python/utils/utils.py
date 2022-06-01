@@ -6,6 +6,7 @@ import os
 import time
 from numpy import linspace, meshgrid
 from matplotlib.mlab import griddata
+from python.constants import *
 
 import config as cf
 from python.network.network import *
@@ -84,6 +85,20 @@ def print_coverage_info(traces):
             print("%s: %s avg (std): %f (%f)" % args)
 
 
+# def plot_energy_depletion_info(network):
+#     energy_depletion_info = network.energy_depletion_info
+#
+#     x_axis = energy_depletion_info['round']
+#     y_axis = energy_depletion_info['remaining_energy']
+#
+#     fig, ax = plt.subplots()
+#     ax.set(xlabel="Number of Rounds", ylabel="Remaining Energy")
+#     plt.plot(x_axis, y_axis, 'g-.')
+#     plt.xlim(xmin=0)
+#     plt.ylim(ymin=0, ymax=2100.0)
+#     plt.show()
+
+
 def save2csv(traces):
     to_csv = []
     for scenario_name, tracer in traces.items():
@@ -118,6 +133,10 @@ def plot_traces(traces):
     color_idx = 0
     line_idx = 0
     for scenario, tracer in traces.items():
+
+        # Split scenario string
+        scenario_strings = scenario.split(" ")
+
         subplot_idx = 1
         for trace_name, trace in tracer.items():
             if not trace[3]:
@@ -126,7 +145,7 @@ def plot_traces(traces):
             # ax.set_title(trace_name)
             X = range(0, len(trace[2]))
             color_n_line = colors[color_idx] + line_style[line_idx]
-            plt.plot(X, trace[2], color_n_line, label=scenario)
+            plt.plot(X, trace[2], color_n_line, label=tessellation_protocol_map.get(scenario_strings[1]))
             plt.xlabel(trace[1])
             plt.ylabel(trace[0])
             plt.legend(fontsize=11)
@@ -259,7 +278,7 @@ def log_coverages(pso_wrapper):
 
 
 def grid(x, y, z, resX=100, resY=100):
-    "Convert 3 column data to matplotlib grid"
+    """Convert 3 column data to matplotlib grid"""
     xi = linspace(min(x), max(x), resX)
     yi = linspace(min(y), max(y), resY)
     Z = griddata(x, y, z, xi, yi, interp='linear')

@@ -29,7 +29,7 @@ def run_scenarios():
 
         network.reset()
 
-        routing_topology, optimization, aggregation, nickname = scenario
+        routing_topology, optimization, aggregation, nickname, k_cov_scenario = scenario
 
         if nickname:
             scenario_name = nickname
@@ -57,9 +57,9 @@ def run_scenarios():
         network.set_aggregation_function(eval(aggregation_function))
 
         logging.info(scenario_name + ': running scenario...')
-        traces[scenario_name] = network.simulate()
+        traces[f"{scenario_name} {k_cov_scenario[0]}"] = network.simulate(k_coverage_approach=k_cov_scenario)
 
-        remaining_energies.append(600.0 - network.get_remaining_energy())
+        remaining_energies.append(network.get_remaining_energy())
         average_energies.append(network.get_average_energy())
 
     if cf.TRACE_COVERAGE:

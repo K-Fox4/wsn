@@ -46,15 +46,16 @@ class SleepScheduler(object):
                                           ids, configuration)
 
     def schedule(self):
-        """Runs PSO to decide which nodes in the cluster will sleep. The cur-
-    rent cluster head should not be put to sleep, otherwise all informa-
-    tion for that node is lost.
-    """
+        """
+        Runs PSO to decide which nodes in the cluster will sleep. The
+        current cluster head should not be put to sleep, otherwise all
+        information for that node is lost.
+        """
         # when a single node (CH) is alive you must keep it awake
-        if (self._cluster.count_alive_nodes() <= 1):
+        if self._cluster.count_alive_nodes() <= 1:
             return {}
         membership = self._cluster[0].membership
-        logging.debug("running sleep scheduling for cluster %d" % (membership))
+        logging.debug("running sleep scheduling for cluster %d" % membership)
         # no need to run sleep scheduling if all nodes are dead
 
         # calculate sleep probability for each node
