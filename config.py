@@ -118,16 +118,25 @@ scenario34 = ('FCM', None, 'zero', 'BS at (-65,-65)')
 
 """k-coverage protocols"""
 
+# Just LEACH
+leach = ('LEACH', None, 'zero', "LEACH", ("", 0))
+
 # k-CSqu protocol of square tessellation
-leach_kcsqu = ('LEACH', None, 'zero', "LEACH", ("square", 3))
+k_csqu = ('LEACH', None, 'zero', "k_CSqu", ("square", 3))
+
+# k-InnRhom protocol of Irregular Hexagonal (Type 1) tessellation
+k_innrhom = ('LEACH', None, 'zero', "k_InnRhom", ("irrhex1", 3))
 
 # DIRACCk protocol of Reuleaux triangle tessellation
-leach_diracck = ('LEACH', None, 'zero', "LEACH", ("triangle", 3))
+diracck = ('LEACH', None, 'zero', "DIRACCk", ("triangle", 3))
 
 scenarios = [
-    leach_kcsqu,
+    k_innrhom,
+    # k_csqu,
+    diracck,
+    # leach,
+    "plot_network(network)",
     "plot_traces(traces)",
-    "plot_time_of_death(network)",
 ]
 
 # Tracer options
@@ -137,7 +146,7 @@ TRACE_COVERAGE = 1
 TRACE_LEARNING_CURVE = 0
 
 # Runtime configuration
-MAX_ROUNDS = 15000
+MAX_ROUNDS = 1000000
 
 # number of transmissions of sensed information
 # to cluster heads or to
@@ -151,10 +160,10 @@ NOTIFY_POSITION = 0
 NB_NODES = 1000
 
 # node sensor range
-COVERAGE_RADIUS = 15  # meters
+COVERAGE_RADIUS = 25  # meters
 
 # node transmission range
-TX_RANGE = 30  # meters
+TX_RANGE = 50  # meters
 BSID = -1
 
 # area definition
@@ -170,7 +179,7 @@ MSG_LENGTH = 4000  # bits
 HEADER_LENGTH = 150  # bits
 
 # initial energy at every node's battery
-INITIAL_ENERGY = 15  # Joules
+INITIAL_ENERGY = 2  # Joules
 
 # Energy Configurations
 # energy dissipated at the transceiver electronic (/bit)

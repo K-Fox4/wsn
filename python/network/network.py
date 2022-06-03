@@ -2,12 +2,14 @@ import config as cf
 import logging
 import csv
 from python.network.node import *
+from python.constants import *
 from python.utils.grid import *
 import matplotlib.pyplot as plt
 from python.utils.utils import *
 from python.utils.tracer import *
 from python.sleep_scheduling.sleep_scheduler import *
 from multiprocessing.dummy import Pool as ThreadPool
+from shapely.geometry import Point
 
 
 class Network(list):
@@ -29,14 +31,11 @@ class Network(list):
             base_station.pos_y = cf.BS_POS_Y
             self.append(base_station)
 
-        # Plot the network
-        self.plot_network(plot=True)
-
         # TODO: Have a separate list for k-coverage nodes and
         #       implement a method for calculating k-coverage
         #       nodes for every round and update it
 
-        self.k_coverage_nodes = []
+        self.k_coverage_nodes = None
 
         self._dict = {}
         for node in self:
@@ -57,9 +56,10 @@ class Network(list):
         self.energy_spent = []
 
     def reset(self):
-        """Set nodes to initial state so the same placement of nodes can be
-    used by different techniques.
-    """
+        """
+        Set nodes to initial state so the same placement of nodes can be
+        used by different techniques.
+        """
         for node in self:
             node.energy_source.recharge()
             node.reactivate()
@@ -82,6 +82,8 @@ class Network(list):
     def simulate(self, k_coverage_approach):
         tracer = Tracer()
 
+        k_cover = bool(k_coverage_approach[0])
+
         self.routing_protocol.pre_communication(self)
 
         all_alive = 1
@@ -93,9 +95,10 @@ class Network(list):
 
         for round_nb in range(0, cf.MAX_ROUNDS):
 
-            # TODO: Compute the k-coverage nodes for
-            #       every round and use them in '_sensing_phase'
-            #       function
+            # If k-coverage scenario, then compute the
+            # set of nodes that should be used for k-coverage
+            if k_cover:
+                self.k_coverage_nodes = self.selection_of_nodes_for_k_coverage(approach=k_coverage_approach)
 
             self.round = round_nb
             current_remaining_energy = self.get_remaining_energy()
@@ -131,57 +134,71 @@ class Network(list):
             self.deaths_this_round = 0
             self.routing_protocol.broadcast(self)
 
-            self._run_round(round_nb)
+            self._run_round(k_cover_status=k_cover)
 
         tracer['first_depletion'][2].append(self.first_depletion)
         tracer['30per_depletion'][2].append(self.per30_depletion)
 
         return tracer
 
-    def _run_round(self, round):
-        """Run one round. Every node captures using its sensor. Then this
-    information is forwarded through the intermediary nodes to the base
-    station.
-    """
+    def selection_of_nodes_for_k_coverage(self, approach):
+        tessellation = tessellation_class_map.get(approach[0])
+        k = approach[1]
+
+        k_coverage_nodes = []
+
+        for tile in tessellation.tiles:
+            curr_degree_of_cov = 0
+            for node in self.get_alive_nodes():
+                if tile.contains(Point(node.pos_x, node.pos_y)):
+                    k_coverage_nodes.append(node)
+                    curr_degree_of_cov += 1
+
+                if curr_degree_of_cov == k:
+                    break
+
+        return k_coverage_nodes
+
+    def _run_round(self, k_cover_status):
+        """
+        Run one round. Every node captures using its sensor. Then this
+        information is forwarded through the intermediary nodes to the base
+        station.
+        """
         before_energy = self.get_remaining_energy()
         for i in range(0, cf.MAX_TX_PER_ROUND):
-            self._sensing_phase()
+            self._sensing_phase(k_cover_status)
             self._communication_phase()
         after_energy = self.get_remaining_energy()
         self.energy_spent.append(before_energy - after_energy)
 
-    def _sensing_phase(self):
+    def _sensing_phase(self, k_cover=False):
         """Every alive node captures information using its sensor."""
 
-        # TODO: Change the sensing phase for all
-        #       alive nodes to just the k-coverage
-        #       nodes
-
-        for node in self.get_alive_nodes():
+        nodes = self.k_coverage_nodes if k_cover else self.get_alive_nodes()
+        for node in nodes:
             node.sense()
 
     def _communication_phase(self):
-        """Each node transmits respecting its hierarchy: leaves start the
-    communication, then cluster heads forward the messages, until all
-    messages reach the base station. This method works for any hierar-
-    chy (even for LEACH).
-    """
-        # ordinary_nodes = self.get_ordinary_nodes()
-        # heads = self.get_ch_nodes()
-        # msg = str("%d ordinary nodes, %d heads." % (len(ordinary_nodes), len(heads)))
-        # logging.debug("Hierarchical communication: %s" % (msg))
+        """
+        Each node transmits respecting its hierarchy: leaves start the
+        communication, then cluster heads forward the messages, until all
+        messages reach the base station. This method works for any hierar-
+        chy (even for LEACH).
+        """
 
-        alive_nodes = self.get_alive_nodes()
         if self.perform_two_level_comm == 1:
-            self._two_level_comm(alive_nodes)
+            self._two_level_comm()
         else:
+            alive_nodes = self.get_alive_nodes()
             self._recursive_comm(alive_nodes)
 
     def _recursive_comm(self, alive_nodes):
-        """Hierarchical communication using recursivity. This method suppo-
-    ses that there is no cycle in the network (network is a tree).
-    Otherwise, expect infinite loop.
-    """
+        """
+        Hierarchical communication using recursivity. This method suppo-
+        ses that there is no cycle in the network (network is a tree).
+        Otherwise, expect infinite loop.
+        """
         next_alive_nodes = alive_nodes[:]
         for node in alive_nodes:
             # check if other nodes must send info to this node
@@ -202,11 +219,12 @@ class Network(list):
         else:
             self._recursive_comm(next_alive_nodes)
 
-    def _two_level_comm(self, alive_nodes):
-        """This method performs communication supposing that there are only
-    ordinary nodes and cluster heads, this method is less generic than
-    its recursive version, but it is faster.
-    """
+    def _two_level_comm(self):
+        """
+        This method performs communication supposing that there are only
+        ordinary nodes and cluster heads, this method is less generic than
+        its recursive version, but it is faster.
+        """
         # heads wait for all ordinary nodes, then transmit to BS
         for node in self.get_ordinary_nodes():
             node.transmit()
@@ -218,8 +236,10 @@ class Network(list):
         return [node for node in self[0:-1] if node.alive]
 
     def get_active_nodes(self):
-        """Return nodes that have positive remaining energy and that are
-    awake."""
+        """
+        Return nodes that have positive remaining energy and that are
+        awake.
+        """
         is_active = lambda x: x.alive and not x.is_sleeping
         return [node for node in self[0:-1] if is_active(node)]
 
@@ -293,8 +313,10 @@ class Network(list):
             node.aggregation_function = function
 
     def split_in_clusters(self, nb_clusters=cf.NB_CLUSTERS):
-        """Split this nodes object into other nodes objects that contain only
-    information about a single cluster."""
+        """
+        Split this nodes object into other nodes objects that contain only
+        information about a single cluster.
+        """
         clusters = []
         for cluster_idx in range(0, nb_clusters):
             nodes = self.get_nodes_by_membership(cluster_idx)
@@ -304,9 +326,10 @@ class Network(list):
         return clusters
 
     def _calculate_nb_neighbors(self, target_node):
-        """Calculate the number of neighbors given the sensor coverage
-    radius.
-    """
+        """
+        Calculate the number of neighbors given the sensor coverage
+        radius.
+        """
         # if number of neighbors was calculated at least once
         # skips calculating the distance
         if target_node.nb_neighbors != -1:
@@ -345,34 +368,3 @@ class Network(list):
     def update_sleep_prob(self):
         for node in self.get_alive_nodes():
             node.update_sleep_prob()
-
-    def plot_network(self, plot: bool = False) -> None:
-        if plot:
-            # Get the coordinates for all Nodes
-            node_x_coords = [node.pos_x for node in self[0:-1]]
-            node_y_coords = [node.pos_y for node in self[0:-1]]
-
-            # Plot setup
-            fig, ax = plt.subplots()
-
-            # Plotting the sensor nodes
-            ax.scatter(node_x_coords, node_y_coords, marker='.', color='r', s=80, label='Sensor')
-
-            # Get the base station coordinates
-            base_station_x_coord = [self.get_BS().pos_x]
-            base_station_y_coord = [self.get_BS().pos_y]
-
-            # Plot the base station
-            ax.scatter(base_station_x_coord, base_station_y_coord, color='b', marker='h', s=80, label='Sink')
-
-            # Set the plot attributes
-            ax.legend(bbox_to_anchor=(1.05, 1.0), loc='upper left', fontsize=11, borderaxespad=0.)
-            # ax.legend(loc='best', fontsize=11)
-            plt.tight_layout()
-            plt.gca().set_aspect('equal', adjustable='box')
-            plt.xlim(xmin=0, xmax=cf.AREA_WIDTH)
-            plt.ylim(ymin=0, ymax=cf.AREA_LENGTH)
-
-            # Display the plot
-            plt.show()
-

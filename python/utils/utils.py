@@ -136,6 +136,7 @@ def plot_traces(traces):
 
         # Split scenario string
         scenario_strings = scenario.split(" ")
+        label_str = tessellation_protocol_label_map.get(scenario_strings[1], scenario_strings[0])
 
         subplot_idx = 1
         for trace_name, trace in tracer.items():
@@ -145,17 +146,47 @@ def plot_traces(traces):
             # ax.set_title(trace_name)
             X = range(0, len(trace[2]))
             color_n_line = colors[color_idx] + line_style[line_idx]
-            plt.plot(X, trace[2], color_n_line, label=tessellation_protocol_map.get(scenario_strings[1]))
+            plt.plot(X, trace[2], color_n_line, label=label_str)
             plt.xlabel(trace[1])
             plt.ylabel(trace[0])
+            plt.xlim(xmin=0)
+            plt.ylim(ymin=0)
+            plt.grid(b=True, which='major', color='0.6', linestyle='--')
             plt.legend(fontsize=11)
             subplot_idx += 1
         color_idx = (color_idx + 1) % len(colors)
         line_idx = (line_idx + 1) % len(line_style)
 
-    plt.xlim(xmin=0)
-    plt.ylim(ymin=0)
-    plt.grid(b=True, which='major', color='0.6', linestyle='--')
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_network(network):
+    # Get the coordinates for all Nodes
+    node_x_coords = [node.pos_x for node in network[0:-1]]
+    node_y_coords = [node.pos_y for node in network[0:-1]]
+
+    # Plot setup
+    fig, ax = plt.subplots()
+
+    # Plotting the sensor nodes
+    ax.scatter(node_x_coords, node_y_coords, marker='.', color='r', s=80, label='Sensor')
+
+    # Get the base station coordinates
+    base_station_x_coord = [network.get_BS().pos_x]
+    base_station_y_coord = [network.get_BS().pos_y]
+
+    # Plot the base station
+    ax.scatter(base_station_x_coord, base_station_y_coord, color='b', marker='h', s=80, label='Sink')
+
+    # Set the plot attributes
+    ax.legend(bbox_to_anchor=(1.05, 1.0), loc='upper left', fontsize=11, borderaxespad=0.)
+    plt.tight_layout()
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.xlim(xmin=0, xmax=cf.AREA_WIDTH)
+    plt.ylim(ymin=0, ymax=cf.AREA_LENGTH)
+
+    # Display the plot
     plt.show()
 
 
@@ -235,12 +266,12 @@ def plot_time_of_death(network):
     heads = [x for x in network.centroids]
     X = [node.pos_x for node in heads]
     Y = [node.pos_y for node in heads]
-    plt.scatter(X, Y, color='r', marker='^', s=80)
+    plt.scatter(X, Y, color='r', marker='^', s=80, label='Centroids')
 
     # print BS
     X = [network.get_BS().pos_x]
     Y = [network.get_BS().pos_y]
-    plt.scatter(X, Y, color='r', marker='x', s=80)
+    plt.scatter(X, Y, color='r', marker='h', s=80, label="Sink")
 
     # plot nodes
     for cluster_id in range(0, cf.NB_CLUSTERS):

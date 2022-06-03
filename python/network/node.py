@@ -114,7 +114,7 @@ class Node(object):
 
     @_only_active_nodes
     def _aggregate(self, msg_length):
-        logging.debug("node %d aggregating." % (self.id))
+        logging.debug("node %d aggregating." % self.id)
         # number of bits to be sent increase while forwarding messages
         aggregation_cost = self.aggregation_function(msg_length)
         self.tx_queue_size += aggregation_cost
@@ -125,7 +125,7 @@ class Node(object):
 
     @_only_active_nodes
     def transmit(self, msg_length=None, destination=None):
-        logging.debug("node %d transmitting." % (self.id))
+        logging.debug("node %d transmitting." % self.id)
         if not msg_length:
             msg_length = self.tx_queue_size
         msg_length += cf.HEADER_LENGTH
@@ -154,7 +154,7 @@ class Node(object):
 
     @_only_active_nodes
     def receive(self, msg_length):
-        logging.debug("node %d receiving." % (self.id))
+        logging.debug("node %d receiving." % self.id)
         self._aggregate(msg_length - cf.HEADER_LENGTH)
 
         self.amount_received += msg_length
