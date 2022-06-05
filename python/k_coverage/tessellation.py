@@ -5,9 +5,43 @@ import math
 from shapely.geometry import Point, Polygon
 
 
+class Tile(Polygon):
+
+    def __init__(self, shell=None, tile_name=None, side=None, holes=None):
+
+        Polygon.__init__(self, shell, holes)
+        self.tile_name = tile_name
+        self.side = side
+        self.inner_radius = round(0.5 * math.sqrt(3) * self.side, 2) if self.tile_name == "irrhex1" else \
+            round(0.5 * math.sqrt(2 - math.sqrt(3)) * self.side, 2)
+
+    def distance_from_centroid(self, x, y):
+        centroid = self.centroid
+        return round(math.sqrt(
+            math.pow(centroid.x - x, 2) + math.pow(centroid.y - y, 2)),
+            2)
+
+    def move_instructions(self, x, y):
+        centroid = self.centroid
+        d = self.distance_from_centroid(x, y)
+
+        cos_theta = abs(centroid.x - x) / d
+        sin_theta = abs(centroid.y - y) / d
+
+        # Per round, sensor speed is the distance
+        # moved by a sensor
+        x_new = (d - cf.SENSOR_SPEED) * cos_theta
+        y_new = (d - cf.SENSOR_SPEED) * sin_theta
+
+        distance_to_move = cf.SENSOR_SPEED
+
+        return x_new, y_new, distance_to_move
+
+
 class Tessellation:
 
     def __init__(self):
+        self.tile_name = None
         self.tiles = []
         self.points = []
         self.x_max = int(cf.AREA_LENGTH)
@@ -19,6 +53,7 @@ class ReuleauxTriangle(Tessellation):
     def __init__(self):
         super().__init__()
 
+        self.tile_name = "triangle"
         self.points = self.get_all_points()
         self.tiles = self.get_tiles_info()
         self.total_num_of_tiles = len(self.tiles)
@@ -82,42 +117,54 @@ class ReuleauxTriangle(Tessellation):
                 # Reuleaux triangle base
                 if ind_i % 2 == 0:
                     if ind_j == x_iterations - 1:
-                        tiles.append(Polygon(
+                        tiles.append(Tile(
                             [self.points[ind_i][ind_j],
                              self.points[ind_i + 1][ind_j + 1],
-                             self.points[ind_i + 1][ind_j]]
+                             self.points[ind_i + 1][ind_j]],
+                            self.tile_name,
+                            int(cf.COVERAGE_RADIUS)
                         ))
                     else:
-                        tiles.append(Polygon(
+                        tiles.append(Tile(
                             [self.points[ind_i][ind_j],
                              self.points[ind_i + 1][ind_j + 1],
-                             self.points[ind_i + 1][ind_j]]
+                             self.points[ind_i + 1][ind_j]],
+                            self.tile_name,
+                            int(cf.COVERAGE_RADIUS)
                         ))
-                        tiles.append(Polygon(
+                        tiles.append(Tile(
                             [self.points[ind_i][ind_j],
                              self.points[ind_i][ind_j + 1],
-                             self.points[ind_i + 1][ind_j + 1]]
+                             self.points[ind_i + 1][ind_j + 1]],
+                            self.tile_name,
+                            int(cf.COVERAGE_RADIUS)
                         ))
 
                 # If the row has starting and ending half
                 # base divisions
                 else:
                     if ind_j == 0:
-                        tiles.append(Polygon(
+                        tiles.append(Tile(
                             [self.points[ind_i][ind_j],
                              self.points[ind_i][ind_j + 1],
-                             self.points[ind_i + 1][ind_j]]
+                             self.points[ind_i + 1][ind_j]],
+                            self.tile_name,
+                            int(cf.COVERAGE_RADIUS)
                         ))
                     else:
-                        tiles.append(Polygon(
+                        tiles.append(Tile(
                             [self.points[ind_i][ind_j],
                              self.points[ind_i + 1][ind_j],
-                             self.points[ind_i + 1][ind_j - 1]]
+                             self.points[ind_i + 1][ind_j - 1]],
+                            self.tile_name,
+                            int(cf.COVERAGE_RADIUS)
                         ))
-                        tiles.append(Polygon(
+                        tiles.append(Tile(
                             [self.points[ind_i][ind_j],
                              self.points[ind_i][ind_j + 1],
-                             self.points[ind_i + 1][ind_j]]
+                             self.points[ind_i + 1][ind_j]],
+                            self.tile_name,
+                            int(cf.COVERAGE_RADIUS)
                         ))
 
         return tiles
@@ -128,6 +175,7 @@ class Square(Tessellation):
     def __init__(self):
         super().__init__()
 
+        self.tile_name = "square"
         self.tiles = self.get_tiles_info()
         self.total_num_of_tiles = len(self.tiles)
 
@@ -137,11 +185,13 @@ class Square(Tessellation):
 
         for y in range(0, self.y_max, radius):
             for x in range(0, self.x_max, radius):
-                tiles.append(Polygon(
+                tiles.append(Tile(
                     [(x, y),
                      (x + radius, y),
                      (x + radius, y + radius),
-                     (x, y + radius)]
+                     (x, y + radius)],
+                    self.tile_name,
+                    int(cf.COVERAGE_RADIUS)
                 ))
 
         return tiles
@@ -152,6 +202,7 @@ class IrregularHexagon1(Tessellation):
     def __init__(self, factor=5):
         super().__init__()
 
+        self.tile_name = "irrhex1"
         self.factor = factor
         self.points = self.get_all_points()
         self.tiles = self.get_tiles_info()
@@ -228,22 +279,26 @@ class IrregularHexagon1(Tessellation):
 
                     # Half Irregular Hexagonal tile
                     if ind_j % 2 == 0:
-                        tiles.append(Polygon(
+                        tiles.append(Tile(
                             [self.points[ind_i][ind_j],
                              self.points[ind_i + 1][ind_j],
                              self.points[ind_i + 1][ind_j + 1],
-                             self.points[ind_i][ind_j + 1]]
+                             self.points[ind_i][ind_j + 1]],
+                            self.tile_name,
+                            int(cf.COVERAGE_RADIUS) // self.factor
                         ))
 
                     # Full Irregular Hexagonal tile
                     else:
-                        tiles.append(Polygon(
+                        tiles.append(Tile(
                             [self.points[ind_i][ind_j],
                              self.points[ind_i + 1][ind_j],
                              self.points[ind_i + 1][ind_j + 1],
                              self.points[ind_i + 1][ind_j + 2],
                              self.points[ind_i][ind_j + 2],
-                             self.points[ind_i][ind_j + 1]]
+                             self.points[ind_i][ind_j + 1]],
+                            self.tile_name,
+                            int(cf.COVERAGE_RADIUS) // self.factor
                         ))
 
                 # Uniform gap between the consecutive
@@ -252,13 +307,15 @@ class IrregularHexagon1(Tessellation):
 
                     # Generating tile with uniform gaps
                     if ind_j % 2 == 0:
-                        tiles.append(Polygon(
+                        tiles.append(Tile(
                             [self.points[ind_i][ind_j],
                              self.points[ind_i - 1][ind_j],
                              self.points[ind_i - 1][ind_j + 1],
                              self.points[ind_i][ind_j + 1],
                              self.points[ind_i + 1][ind_j + 1],
-                             self.points[ind_i + 1][ind_j]]
+                             self.points[ind_i + 1][ind_j]],
+                            self.tile_name,
+                            int(cf.COVERAGE_RADIUS) // self.factor
                         ))
 
                 # Continuous Irregular Hexagonal tiles
@@ -267,25 +324,29 @@ class IrregularHexagon1(Tessellation):
                     # Selecting Irregular Hexagon using
                     # middle left vertex
                     if ind_j % 2 == 0:
-                        tiles.append(Polygon(
+                        tiles.append(Tile(
                             [self.points[ind_i][ind_j],
                              self.points[ind_i - 1][ind_j],
                              self.points[ind_i - 1][ind_j + 1],
                              self.points[ind_i][ind_j + 1],
                              self.points[ind_i + 1][ind_j + 1],
-                             self.points[ind_i + 1][ind_j]]
+                             self.points[ind_i + 1][ind_j]],
+                            self.tile_name,
+                            int(cf.COVERAGE_RADIUS) // self.factor
                         ))
 
                     # Selecting Irregular Hexagon using
                     # bottom left vertex
                     else:
-                        tiles.append(Polygon(
+                        tiles.append(Tile(
                             [self.points[ind_i][ind_j],
                              self.points[ind_i + 1][ind_j],
                              self.points[ind_i + 1][ind_j + 1],
                              self.points[ind_i + 1][ind_j + 2],
                              self.points[ind_i][ind_j + 2],
-                             self.points[ind_i][ind_j + 1]]
+                             self.points[ind_i][ind_j + 1]],
+                            self.tile_name,
+                            int(cf.COVERAGE_RADIUS) // self.factor
                         ))
 
         return tiles
@@ -306,17 +367,20 @@ if __name__ == "__main__":
     """
         Testing of Square tessellation code
     """
-    # test = Square()
+    test = Square()
 
     """
         Testing of Irregular Hexagon (Type 1 of Kalyan) tessellation code
     """
-    test = IrregularHexagon1(factor=5)
+    # test = IrregularHexagon1(factor=5)
 
-    print("Calculated points for the Reuleaux triangle tessellation are,\n")
-    print(*test.points, sep="\n")
+    # print("Calculated points for the Irregular Hexagon (Type 1 of Kalyan) tessellation are,\n")
+    # print(*test.points, sep="\n")
 
-    # print(f"\nTotal tiles generated for this tessellation are {len(test.tiles)}")
+    for i in range(len(test.tiles)):
+        print(f"The Centroid of Tile#{i} is {test.tiles[i].centroid}")
+
+    print(f"\nTotal tiles generated for this tessellation are {len(test.tiles)}")
 
     points = [(np.random.uniform(0, cf.AREA_WIDTH), np.random.uniform(0, cf.AREA_LENGTH)) for _ in range(1000)]
     k = 3

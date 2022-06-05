@@ -98,7 +98,12 @@ class Network(list):
             # If k-coverage scenario, then compute the
             # set of nodes that should be used for k-coverage
             if k_cover:
-                self.k_coverage_nodes = self.selection_of_nodes_for_k_coverage(approach=k_coverage_approach)
+                self.k_coverage_nodes = self.selection_of_nodes_for_k_coverage(
+                    approach=k_coverage_approach
+                )
+
+            print(f"k-coverage scenario running is "
+                  f"{tessellation_protocol_map.get(k_coverage_approach[0])}")
 
             self.round = round_nb
             current_remaining_energy = self.get_remaining_energy()
@@ -148,12 +153,49 @@ class Network(list):
         k_coverage_nodes = []
 
         for tile in tessellation.tiles:
+
             curr_degree_of_cov = 0
+
             for node in self.get_alive_nodes():
+
                 if tile.contains(Point(node.pos_x, node.pos_y)):
                     k_coverage_nodes.append(node)
                     curr_degree_of_cov += 1
 
+                """
+                ****************
+                Move code: Start
+                ****************
+                """
+                """
+                # If the tessellation is Reuleaux
+                # Triangle tessellation
+                if tile.tile_name == "triangle":
+                    if tile.contains(Point(node.pos_x, node.pos_y)):
+                        k_coverage_nodes.append(node)
+                        curr_degree_of_cov += 1
+
+                # If the tessellation is either
+                # Square or Irregular Hexagon
+                else:
+
+                    # Distance from centroid is higher than the
+                    # limited area
+                    if tile.distance_from_centroid(node.pos_x, node.pos_y) > tile.inner_radius:
+                        x_n, y_n, distance = tile.move_instructions(node.pos_x, node.pos_y)
+                        node.move(x=x_n, y=y_n, distance=distance)
+
+                    k_coverage_nodes.append(node)
+                    curr_degree_of_cov += 1
+                """
+                """
+                **************
+                Move code: End
+                **************
+                """
+
+                # If expected degree of coverage is achieved
+                # then break the execution for that tile
                 if curr_degree_of_cov == k:
                     break
 

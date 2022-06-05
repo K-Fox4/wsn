@@ -1,3 +1,5 @@
+import random
+
 import config as cf
 import numpy as np
 from python.network.energy_source import *
@@ -89,20 +91,20 @@ class Node(object):
 
         return
 
-    @_only_active_nodes
-    def update_sleep_prob2(self, nb_neighbors):
-        """Updates the sleep probability according to paper X."""
-        if self.next_hop == cf.BSID:
-            self.sleep_prob = 0.0
-        if nb_neighbors == 0:
-            term1 = 0
-        else:
-            term1 = PSO_E * (nb_neighbors - 1) / nb_neighbors
-        if self.distance_to_endpoint == 0:
-            term2 = 0
-        else:
-            term2 = PSO_F * (self.distance_to_endpoint - 1) / self.distance_to_endpoint
-        self.sleep_prob = term1 + term2
+    # @_only_active_nodes
+    # def update_sleep_prob2(self, nb_neighbors):
+    #     """Updates the sleep probability according to paper X."""
+    #     if self.next_hop == cf.BSID:
+    #         self.sleep_prob = 0.0
+    #     if nb_neighbors == 0:
+    #         term1 = 0
+    #     else:
+    #         term1 = PSO_E * (nb_neighbors - 1) / nb_neighbors
+    #     if self.distance_to_endpoint == 0:
+    #         term2 = 0
+    #     else:
+    #         term2 = PSO_F * (self.distance_to_endpoint - 1) / self.distance_to_endpoint
+    #     self.sleep_prob = term1 + term2
 
     def is_head(self):
         if self.next_hop == cf.BSID and self.id != cf.BSID and self.alive:
@@ -167,6 +169,20 @@ class Node(object):
     def sense(self):
         self.tx_queue_size = cf.MSG_LENGTH
         self.amount_sensed += cf.MSG_LENGTH
+
+    @_only_active_nodes
+    def move(self, x, y, distance):
+        # Update the x and y coordinates of
+        # the sensor indicating that it has
+        # been moved to desired location
+        self.pos_x = x
+        self.pos_y = y
+
+        # Energy utilized in moving
+        # the sensor
+        energy_move = random.uniform(cf.E_MOVE[0], cf.E_MOVE[1])
+        energy = energy_move * distance
+        self.energy_source.consume(energy)
 
     def battery_depletion(self):
         self.alive = 0

@@ -122,20 +122,22 @@ scenario34 = ('FCM', None, 'zero', 'BS at (-65,-65)')
 leach = ('LEACH', None, 'zero', "LEACH", ("", 0))
 
 # k-CSqu protocol of square tessellation
-k_csqu = ('LEACH', None, 'zero', "k_CSqu", ("square", 3))
+k_csqu = ('LEACH', None, 'zero', "k-CSqu", ("square", 3))
 
 # k-InnRhom protocol of Irregular Hexagonal (Type 1) tessellation
-k_innrhom = ('LEACH', None, 'zero', "k_InnRhom", ("irrhex1", 3))
+k_innrhom = ('LEACH', None, 'zero', "k-InDi", ("irrhex1", 3))
 
 # DIRACCk protocol of Reuleaux triangle tessellation
 diracck = ('LEACH', None, 'zero', "DIRACCk", ("triangle", 3))
+diracck_1 = ('DC', None, 'zero', "DIRACCk", ("triangle", 3))
 
 scenarios = [
     k_innrhom,
-    # k_csqu,
-    diracck,
+    k_csqu,
+    # diracck,
     # leach,
-    "plot_network(network)",
+    "save2csv(traces)",
+    # "plot_network(network)",
     "plot_traces(traces)",
 ]
 
@@ -179,7 +181,7 @@ MSG_LENGTH = 4000  # bits
 HEADER_LENGTH = 150  # bits
 
 # initial energy at every node's battery
-INITIAL_ENERGY = 2  # Joules
+INITIAL_ENERGY = 50  # Joules
 
 # Energy Configurations
 # energy dissipated at the transceiver electronic (/bit)
@@ -195,6 +197,12 @@ E_MP = 0.0013e-12  # Joules
 # energy dissipated at the power amplifier (supposing a line-of-sight
 # free-space channel (/bin/m^2)
 E_FS = 10e-12  # Joules
+
+# energy dissipated for moving a sensor (J/m)
+E_MOVE = (0.008, 0.012)
+
+# Speed of the sensor (m/round)
+SENSOR_SPEED = 1
 
 THRESHOLD_DIST = math.sqrt(E_FS / E_MP)  # meters
 
