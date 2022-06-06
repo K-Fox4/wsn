@@ -80,9 +80,13 @@ class Network(list):
         self.perform_two_level_comm = 1
 
     def simulate(self, k_coverage_approach):
+        tessellation = None
         tracer = Tracer()
 
         k_cover = bool(k_coverage_approach[0])
+
+        if k_cover:
+            tessellation = tessellation_class_map.get(k_coverage_approach[0])
 
         self.routing_protocol.pre_communication(self)
 
@@ -99,7 +103,8 @@ class Network(list):
             # set of nodes that should be used for k-coverage
             if k_cover:
                 self.k_coverage_nodes = self.selection_of_nodes_for_k_coverage(
-                    approach=k_coverage_approach
+                    k=k_coverage_approach[1],
+                    tessellation=tessellation
                 )
 
             print(f"k-coverage scenario running is "
@@ -146,9 +151,7 @@ class Network(list):
 
         return tracer
 
-    def selection_of_nodes_for_k_coverage(self, approach):
-        tessellation = tessellation_class_map.get(approach[0])
-        k = approach[1]
+    def selection_of_nodes_for_k_coverage(self, k, tessellation):
 
         k_coverage_nodes = []
 
