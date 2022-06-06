@@ -12,8 +12,18 @@ class Tile(Polygon):
         Polygon.__init__(self, shell, holes)
         self.tile_name = tile_name
         self.side = side
-        self.inner_radius = round(0.5 * math.sqrt(3) * self.side, 2) if self.tile_name == "irrhex1" else \
-            round(0.5 * math.sqrt(2 - math.sqrt(3)) * self.side, 2)
+        self.inner_radius = self.calculate_inner_radius()
+
+    def calculate_inner_radius(self):
+        result = None
+        if self.tile_name == "irrhex1":
+            result = round(0.5 * math.sqrt(3) * self.side, 2)
+        elif self.tile_name == "square":
+            result = round(0.5 * math.sqrt(2 - math.sqrt(3)) * self.side, 2)
+        elif self.tile_name == "triangle":
+            result = round(0.5 * (2 - math.sqrt(3)) * self.side, 2)
+
+        return result
 
     def distance_from_centroid(self, x, y):
         centroid = self.centroid
@@ -107,7 +117,7 @@ class ReuleauxTriangle(Tessellation):
 
     def get_tiles_info(self):
         tiles = []
-        x_iterations = len(self.points[0])
+        x_iterations = len(self.points[0]) - 1
 
         for ind_i in range(len(self.points) - 1):
 
@@ -116,7 +126,12 @@ class ReuleauxTriangle(Tessellation):
                 # If the row is equally divided by the
                 # Reuleaux triangle base
                 if ind_i % 2 == 0:
-                    if ind_j == x_iterations - 1:
+
+                    """
+                    Old code
+                    """
+
+                    """if ind_j == x_iterations - 1:
                         tiles.append(Tile(
                             [self.points[ind_i][ind_j],
                              self.points[ind_i + 1][ind_j + 1],
@@ -138,12 +153,36 @@ class ReuleauxTriangle(Tessellation):
                              self.points[ind_i + 1][ind_j + 1]],
                             self.tile_name,
                             int(cf.COVERAGE_RADIUS)
+                        ))"""
+
+                    if ind_j == 0:
+                        tiles.append(Tile(
+                            [self.points[ind_i][ind_j],
+                             self.points[ind_i][ind_j + 1],
+                             self.points[ind_i + 1][ind_j + 1]],
+                            self.tile_name,
+                            int(cf.COVERAGE_RADIUS)
+                        ))
+
+                    else:
+                        tiles.append(Tile(
+                            [self.points[ind_i][ind_j],
+                             self.points[ind_i - 1][ind_j + 1],
+                             self.points[ind_i][ind_j + 1],
+                             self.points[ind_i + 1][ind_j + 1]],
+                            self.tile_name,
+                            int(cf.COVERAGE_RADIUS)
                         ))
 
                 # If the row has starting and ending half
                 # base divisions
                 else:
-                    if ind_j == 0:
+
+                    """
+                    Old code
+                    """
+
+                    """if ind_j == 0:
                         tiles.append(Tile(
                             [self.points[ind_i][ind_j],
                              self.points[ind_i][ind_j + 1],
@@ -161,6 +200,44 @@ class ReuleauxTriangle(Tessellation):
                         ))
                         tiles.append(Tile(
                             [self.points[ind_i][ind_j],
+                             self.points[ind_i][ind_j + 1],
+                             self.points[ind_i + 1][ind_j]],
+                            self.tile_name,
+                            int(cf.COVERAGE_RADIUS)
+                        ))"""
+
+                    index = ind_j + 1
+
+                    if index == 1:
+                        tiles.append(Tile(
+                            [self.points[ind_i][ind_j],
+                             self.points[ind_i + 1][ind_j - 1],
+                             self.points[ind_i - 1][ind_j - 1]],
+                            self.tile_name,
+                            int(cf.COVERAGE_RADIUS)
+                        ))
+                        tiles.append(Tile(
+                            [self.points[ind_i][ind_j],
+                             self.points[ind_i - 1][ind_j + 1],
+                             self.points[ind_i][ind_j + 1],
+                             self.points[ind_i + 1][ind_j]],
+                            self.tile_name,
+                            int(cf.COVERAGE_RADIUS)
+                        ))
+
+                    elif ind_j == x_iterations - 1:
+                        tiles.append(Tile(
+                            [self.points[ind_i][ind_j],
+                             self.points[ind_i - 1][ind_j + 1],
+                             self.points[ind_i + 1][ind_j + 1]],
+                            self.tile_name,
+                            int(cf.COVERAGE_RADIUS)
+                        ))
+
+                    else:
+                        tiles.append(Tile(
+                            [self.points[ind_i][ind_j],
+                             self.points[ind_i - 1][ind_j + 1],
                              self.points[ind_i][ind_j + 1],
                              self.points[ind_i + 1][ind_j]],
                             self.tile_name,
@@ -357,17 +434,17 @@ if __name__ == "__main__":
     """
     Testing of Reuleaux Triangle tessellation code
     """
-    # test = ReuleauxTriangle()
-    #
-    # print("Calculated points for the Reuleaux triangle tessellation are,\n")
-    # print(*test.points, sep="\n")
+    test = ReuleauxTriangle()
+
+    print("Calculated points for the Reuleaux triangle tessellation are,\n")
+    print(*test.points, sep="\n")
     #
     # print(f"\nTotal tiles generated for this tessellation are {len(test.tiles)}")
 
     """
         Testing of Square tessellation code
     """
-    test = Square()
+    # test = Square()
 
     """
         Testing of Irregular Hexagon (Type 1 of Kalyan) tessellation code
