@@ -31,10 +31,6 @@ class Network(list):
             base_station.pos_y = cf.BS_POS_Y
             self.append(base_station)
 
-        # TODO: Have a separate list for k-coverage nodes and
-        #       implement a method for calculating k-coverage
-        #       nodes for every round and update it
-
         self.k_coverage_nodes = None
 
         self._dict = {}
@@ -60,7 +56,9 @@ class Network(list):
         Set nodes to initial state so the same placement of nodes can be
         used by different techniques.
         """
+
         for node in self:
+            node.reset_position()
             node.energy_source.recharge()
             node.reactivate()
 

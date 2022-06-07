@@ -50,31 +50,33 @@ class Tile(Polygon):
 
 class Tessellation:
 
-    def __init__(self):
+    def __init__(self, area_length):
         self.tile_name = None
         self.tiles = []
         self.points = []
-        self.x_max = int(cf.AREA_LENGTH)
-        self.y_max = int(cf.AREA_WIDTH)
+        self.x_max = area_length
+        self.y_max = area_length
 
 
 class ReuleauxTriangle(Tessellation):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, sensing_radius, area_length):
+        super().__init__(area_length)
 
         self.tile_name = "triangle"
+        self.sensing_radius = sensing_radius
         self.points = self.get_all_points()
         self.tiles = self.get_tiles_info()
         self.total_num_of_tiles = len(self.tiles)
 
     def get_all_points(self):
+
         points = []
 
         extra = 0
         y = 0
-        y_ext = round(0.5 * math.sqrt(3) * int(cf.COVERAGE_RADIUS), 2)
-        x_ext = int(cf.COVERAGE_RADIUS)
+        y_ext = round(0.5 * math.sqrt(3) * self.sensing_radius, 2)
+        x_ext = self.sensing_radius
         n = self.x_max // x_ext
         y_iterations = 1 + math.ceil(self.y_max / y_ext)
 
@@ -249,16 +251,17 @@ class ReuleauxTriangle(Tessellation):
 
 class Square(Tessellation):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, sensing_radius, area_length):
+        super().__init__(area_length)
 
         self.tile_name = "square"
+        self.sensing_radius = sensing_radius
         self.tiles = self.get_tiles_info()
         self.total_num_of_tiles = len(self.tiles)
 
     def get_tiles_info(self):
         tiles = []
-        radius = int(cf.COVERAGE_RADIUS)
+        radius = self.sensing_radius
 
         for y in range(0, self.y_max, radius):
             for x in range(0, self.x_max, radius):
@@ -276,26 +279,66 @@ class Square(Tessellation):
 
 class IrregularHexagon1(Tessellation):
 
-    def __init__(self, factor=5):
-        super().__init__()
+    def __init__(self, sensing_radius, area_length, factor=5):
+        super().__init__(area_length)
 
         self.tile_name = "irrhex1"
+        self.sensing_radius = sensing_radius
         self.factor = factor
         self.points = self.get_all_points()
         self.tiles = self.get_tiles_info()
         self.total_num_of_tiles = len(self.tiles)
 
+    def calculate_x_iterations(self, extension_1, extension_2):
+        flag = True
+
+        count = 0
+        summation = 0
+
+        while summation < self.x_max:
+            if flag:
+                summation += extension_1
+                flag = False
+            else:
+                summation += extension_2
+                flag = True
+
+            count += 1
+
+        return count + 1
+
+    def calculate_y_iterations(self, extension):
+        flag = False
+        count = 0
+        summation = 0
+
+        while summation < self.y_max:
+            summation += extension
+
+            count += 1
+
+        if (count + 1) % 2 == 0:
+            count += 1
+        else:
+            flag = True
+
+        return count, flag
+
     def get_all_points(self):
         points = []
 
-        side = int(cf.COVERAGE_RADIUS) / self.factor
+        side = self.sensing_radius / self.factor
         x_ext_1 = (2 * self.factor - 1) * side
-        x_ext_2 = int(cf.COVERAGE_RADIUS)
-        x_iterations = 2 * math.ceil(self.x_max / (x_ext_1 + x_ext_2))
+        x_ext_2 = self.sensing_radius
+        x_iterations = self.calculate_x_iterations(
+            extension_1=x_ext_1,
+            extension_2=x_ext_2
+        )
 
         y = 0
         y_ext = round((self.factor - 1) * 0.5 * math.sqrt(3) * side, 2)
-        y_iterations = 1 + math.ceil(self.y_max / y_ext)
+        # y_iterations = 1 + math.ceil(self.y_max / y_ext)
+        y_iterations, flag = self.calculate_y_iterations(extension=y_ext)
 
         for ind_i in range(y_iterations):
 
@@ -369,18 +412,18 @@ class IrregularHexagon1(Tessellation):
                     else:
                         tiles.append(Tile(
                             [self.points[ind_i][ind_j],
-                             self.points[ind_i + 1][ind_j],
+                             self.points[ind_i][ind_j + 1],
                              self.points[ind_i + 1][ind_j + 1],
-                             self.points[ind_i + 1][ind_j + 2],
-                             self.points[ind_i][ind_j + 2],
-                             self.points[ind_i][ind_j + 1]],
+                             self.points[ind_i + 2][ind_j + 1],
+                             self.points[ind_i + 2][ind_j],
+                             self.points[ind_i + 1][ind_j]],
                             self.tile_name,
                             int(cf.COVERAGE_RADIUS) // self.factor
                         ))
 
                 # Uniform gap between the consecutive
                 # Irregular hexagonal tiles
-                elif ind_i == y_iterations - 1:
+                elif ind_i == y_iterations - 2:
 
                     # Generating tile with uniform gaps
                     if ind_j % 2 == 0:
@@ -417,11 +460,11 @@ class IrregularHexagon1(Tessellation):
                     else:
                         tiles.append(Tile(
                             [self.points[ind_i][ind_j],
-                             self.points[ind_i + 1][ind_j],
+                             self.points[ind_i][ind_j + 1],
                              self.points[ind_i + 1][ind_j + 1],
-                             self.points[ind_i + 1][ind_j + 2],
-                             self.points[ind_i][ind_j + 2],
-                             self.points[ind_i][ind_j + 1]],
+                             self.points[ind_i + 2][ind_j + 1],
+                             self.points[ind_i + 2][ind_j],
+                             self.points[ind_i + 1][ind_j]],
                             self.tile_name,
                             int(cf.COVERAGE_RADIUS) // self.factor
                         ))
@@ -434,10 +477,10 @@ if __name__ == "__main__":
     """
     Testing of Reuleaux Triangle tessellation code
     """
-    test = ReuleauxTriangle()
-
-    print("Calculated points for the Reuleaux triangle tessellation are,\n")
-    print(*test.points, sep="\n")
+    # test = ReuleauxTriangle()
+    #
+    # print("Calculated points for the Reuleaux triangle tessellation are,\n")
+    # print(*test.points, sep="\n")
     #
     # print(f"\nTotal tiles generated for this tessellation are {len(test.tiles)}")
 
@@ -449,10 +492,14 @@ if __name__ == "__main__":
     """
         Testing of Irregular Hexagon (Type 1 of Kalyan) tessellation code
     """
-    # test = IrregularHexagon1(factor=5)
+    test = IrregularHexagon1(
+        sensing_radius=45,
+        area_length=int(cf.AREA_LENGTH),
+        factor=5
+    )
 
-    # print("Calculated points for the Irregular Hexagon (Type 1 of Kalyan) tessellation are,\n")
-    # print(*test.points, sep="\n")
+    print("Calculated points for the Irregular Hexagon (Type 1 of Kalyan) tessellation are,\n")
+    print(*test.points, sep="\n")
 
     for i in range(len(test.tiles)):
         print(f"The Centroid of Tile#{i} is {test.tiles[i].centroid}")
