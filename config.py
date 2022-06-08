@@ -118,26 +118,25 @@ scenario34 = ('FCM', None, 'zero', 'BS at (-65,-65)')
 
 """k-coverage protocols"""
 
-# Just LEACH
+# Existing scenarios
 leach = ('LEACH', None, 'zero', "LEACH", ("", 0))
+direct_comm = ('DC', None, 'zero', "Direct Comm.", ("", 0))
+mte = ('MTE', None, 'total', "MTE", ("", 0))
 
 # k-CSqu protocol of square tessellation
 k_csqu = ('LEACH', None, 'zero', "k-CSqu", ("square", 3))
 
 # k-InnRhom protocol of Irregular Hexagonal (Type 1) tessellation
-k_innrhom = ('LEACH', None, 'zero', "k-InDi", ("irrhex1", 3))
+k_indi = ('LEACH', None, 'zero', "k-InDi", ("irrhex1", 3))
 
 # DIRACCk protocol of Reuleaux triangle tessellation
 diracck = ('LEACH', None, 'zero', "DIRACCk", ("triangle", 3))
-diracck_1 = ('DC', None, 'zero', "DIRACCk", ("triangle", 3))
 
 scenarios = [
-    k_innrhom,
-    k_csqu,
-    # diracck,
-    # leach,
-    "save2csv(traces)",
-    # "plot_network(network)",
+    "plot_network(network)",
+    k_indi,
+    # k_csqu,
+    diracck,
     "plot_traces(traces)",
 ]
 
@@ -181,7 +180,7 @@ MSG_LENGTH = 4000  # bits
 HEADER_LENGTH = 150  # bits
 
 # initial energy at every node's battery
-INITIAL_ENERGY = 50  # Joules
+INITIAL_ENERGY = 70  # Joules
 
 # Energy Configurations
 # energy dissipated at the transceiver electronic (/bit)
