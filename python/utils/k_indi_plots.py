@@ -6,7 +6,7 @@ from python.k_coverage import *
 
 
 def plot_lambda_vs_k(sensing_radius: int = 25, n: int = 5) -> None:
-    k = range(2, 9, 1)
+    k = range(3, 10, 1)
     total_coverage_area = (math.pow(sensing_radius, 2)) * (
             math.pi +
             ((math.sqrt(3) * ((3 * math.pow(n, 2)) - (6 * n) + 2)) / (4 * math.pow(n, 2))) -
@@ -38,10 +38,10 @@ def plot_lambda_vs_k(sensing_radius: int = 25, n: int = 5) -> None:
            xlabel=r'$\it{k}$',
            ylabel=r'Planar Sensor Density $(\lambda)$')
     plt.plot(k, theoretical, 'b-', label=r'$\lambda_{theo}$')
-    plt.plot(k, excluded_theoretical, 'g--', label=r'$\lambda_{theoX}$')
+    plt.plot(k, excluded_theoretical, 'g--', label=r'$\lambda_{X-theo}$')
     plt.plot(k, simulation, 'r-.', label=r'$\lambda_{sim}$')
     plt.legend(fontsize=11)
-    plt.xlim(xmin=2, xmax=8)
+    plt.xlim(xmin=3, xmax=9)
     plt.ylim(ymin=0)
     plt.grid(b=True, which='major', color='0.6', linestyle='--')
     plt.show()
@@ -81,7 +81,7 @@ def plot_lambda_vs_rs(k: int = 3, n: int = 5) -> None:
            xlabel=r'$\it{r_s}$',
            ylabel=r'Planar Sensor Density $(\lambda)$')
     plt.plot(sensing_radius, theoretical, 'b-', label=r'$\lambda_{theo}$')
-    plt.plot(sensing_radius, excluded_theoretical, 'g--', label=r'$\lambda_{theoX}$')
+    plt.plot(sensing_radius, excluded_theoretical, 'g--', label=r'$\lambda_{X-theo}$')
     plt.plot(sensing_radius, simulation, 'r-.', label=r'$\lambda_{sim}$')
     plt.legend(fontsize=11)
     plt.xlim(xmin=15, xmax=45)
@@ -121,20 +121,20 @@ def plot_lambda_vs_n(sensing_radius: int = 25, k: int = 5) -> None:
     # Create plots
     fig, ax = plt.subplots()
     ax.set(title=r'$\it{k}$ = 3 and $\it{r_s}$ = 25 m',
-           xlabel=r'$\it{r_s}$',
+           xlabel=r'$\it{n}$',
            ylabel=r'Planar Sensor Density $(\lambda)$')
     plt.plot(n, theoretical, 'b-', label=r'$\lambda_{theo}$')
-    plt.plot(n, excluded_theoretical, 'g--', label=r'$\lambda_{theoX}$')
+    plt.plot(n, excluded_theoretical, 'g--', label=r'$\lambda_{X-theo}$')
     plt.plot(n, simulation, 'r-.', label=r'$\lambda_{sim}$')
     plt.legend(fontsize=11)
-    plt.xlim(xmin=2, xmax=9)
+    plt.xlim(xmin=2, xmax=8)
     plt.ylim(ymin=0)
     plt.grid(b=True, which='major', color='0.6', linestyle='--')
     plt.show()
 
 
 def plot_lambda_vs_k_for_hexagon_and_triangle(sensing_radius: int = 25, n: int = 5) -> None:
-    k = range(2, 9, 1)
+    k = range(3, 10, 1)
 
     hexagon_grid = IrregularHexagon1(
         sensing_radius=sensing_radius,
@@ -162,7 +162,7 @@ def plot_lambda_vs_k_for_hexagon_and_triangle(sensing_radius: int = 25, n: int =
     plt.plot(k, hexagon_simulation, 'c--', marker='h', label=r'$\it{k}$-InDi')
     plt.plot(k, triangle_simulation, 'g-.', marker='^', label=r'$DIRACC_k$')
     plt.legend(fontsize=11)
-    plt.xlim(xmin=2, xmax=8)
+    plt.xlim(xmin=3, xmax=9)
     plt.ylim(ymin=0)
     plt.grid(b=True, which='major', color='0.6', linestyle='--')
     plt.show()
@@ -229,7 +229,7 @@ def plot_lambda_vs_n_for_hexagon_and_triangle(sensing_radius: int = 25, k: int =
     # Create plots
     fig, ax = plt.subplots()
     ax.set(title=r'$\it{k}$ = 3 and $\it{r_s}$ = 25 m',
-           xlabel=r'$\it{r_s}$',
+           xlabel=r'$\it{n}$',
            ylabel=r'Planar Sensor Density $(\lambda)$')
     plt.plot(n, hexagon_simulation, 'c--', marker='h', label=r'$\it{k}$-InDi')
     plt.plot(n, triangle_simulation, 'g-.', marker='^', label=r'$DIRACC_k$')
@@ -244,6 +244,17 @@ if __name__ == "__main__":
     # plot_lambda_vs_k()
     # plot_lambda_vs_rs()
     # plot_lambda_vs_n()
-    # plot_lambda_vs_k_for_hexagon_and_triangle()
+    plot_lambda_vs_k_for_hexagon_and_triangle()
     # plot_lambda_vs_rs_for_hexagon_and_triangle()
-    plot_lambda_vs_n_for_hexagon_and_triangle()
+    # plot_lambda_vs_n_for_hexagon_and_triangle()
+    for n_val in range(2, 25):
+        value = (
+                math.pi +
+                ((math.sqrt(3) * ((3 * math.pow(n_val, 2)) - (6 * n_val) + 2)) / (4 * math.pow(n_val, 2))) -
+                ((math.sqrt((4 * math.pow(n_val, 2)) - 1)) / math.pow(n_val, 2)) -
+                4 * math.asin(1 / (2 * n_val))
+        )
+
+        excluded_value = (2 * math.pow(n_val, 2))/(math.sqrt(3) * (n_val - 1) * ((3 * n_val) - 1))
+
+        print(f"For n = {n_val}, the value is {round(1/value, 4)} and the excluded value is {round(excluded_value, 4)}")

@@ -147,12 +147,12 @@ def plot_traces(traces):
             X = range(0, len(trace[2]))
             color_n_line = colors[color_idx] + line_style[line_idx]
             plt.plot(X, trace[2], color_n_line, label=label_str)
-            plt.xlabel(trace[1])
-            plt.ylabel(trace[0])
+            plt.xlabel(trace[1], fontsize=15, fontweight='bold')
+            plt.ylabel(trace[0], fontsize=15, fontweight='bold')
             plt.xlim(xmin=0)
             plt.ylim(ymin=0)
             plt.grid(b=True, which='major', color='0.6', linestyle='--')
-            plt.legend(fontsize=11)
+            plt.legend(fontsize=15)
             subplot_idx += 1
         color_idx = (color_idx + 1) % len(colors)
         line_idx = (line_idx + 1) % len(line_style)
