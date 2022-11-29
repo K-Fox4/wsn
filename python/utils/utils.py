@@ -146,9 +146,12 @@ def plot_traces(traces):
             # ax.set_title(trace_name)
             X = range(0, len(trace[2]))
             color_n_line = colors[color_idx] + line_style[line_idx]
-            plt.plot(X, trace[2], color_n_line, label=label_str)
+            plt.plot(X, trace[2], color_n_line, label=label_str, linewidth=3)
+
+            # plt.title(r'$\it{r_s}$ = 25 m & $\it{k}$ = 3', fontsize=15, fontweight='bold')
             plt.xlabel(trace[1], fontsize=15, fontweight='bold')
             plt.ylabel(trace[0], fontsize=15, fontweight='bold')
+
             plt.xlim(xmin=0)
             plt.ylim(ymin=0)
             plt.grid(b=True, which='major', color='0.6', linestyle='--')

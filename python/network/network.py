@@ -84,7 +84,7 @@ class Network(list):
         k_cover = bool(k_coverage_approach[0])
 
         if k_cover:
-            tessellation = tessellation_class_map.get(k_coverage_approach[0])
+            tessellation = get_tessellation_class_for_tile(k_coverage_approach)
 
         self.routing_protocol.pre_communication(self)
 

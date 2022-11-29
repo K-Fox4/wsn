@@ -118,25 +118,58 @@ scenario34 = ('FCM', None, 'zero', 'BS at (-65,-65)')
 
 """k-coverage protocols"""
 
+# (TILE_NAME, K, IS_STOCHASTIC_SENSING ?, ALPHA, BETA, PTH)
+
 # Existing scenarios
-leach = ('LEACH', None, 'zero', "LEACH", ("", 0))
-direct_comm = ('DC', None, 'zero', "Direct Comm.", ("", 0))
-mte = ('MTE', None, 'total', "MTE", ("", 0))
+leach = ('LEACH', None, 'zero', "LEACH", ("", 0, False))
+direct_comm = ('DC', None, 'zero', "Direct Comm.", ("", 0, False))
+mte = ('MTE', None, 'total', "MTE", ("", 0, False))
 
 # k-CSqu protocol of square tessellation
-k_csqu = ('LEACH', None, 'zero', "k-CSqu", ("square", 3))
+k_csqu_d = ('LEACH', None, 'zero', "k-CSqu", ("square", 3, False, 0, 0, 0))
+
+# ALPHA = [2, 3, 4], BETA = 0.025, PTH = 0.7
+k_csqu_s27 = ('LEACH', None, 'zero', "k-CSqu", ("square", 3, True, 2, 0.025, 0.7))
+k_csqu_s37 = ('LEACH', None, 'zero', "k-CSqu", ("square", 3, True, 3, 0.025, 0.7))
+k_csqu_s47 = ('LEACH', None, 'zero', "k-CSqu", ("square", 3, True, 4, 0.025, 0.7))
+
+# ALPHA = [2, 3, 4], BETA = 0.025, PTH = 0.8
+k_csqu_s28 = ('LEACH', None, 'zero', "k-CSqu", ("square", 3, True, 2, 0.025, 0.8))
+k_csqu_s38 = ('LEACH', None, 'zero', "k-CSqu", ("square", 3, True, 3, 0.025, 0.8))
+k_csqu_s48 = ('LEACH', None, 'zero', "k-CSqu", ("square", 3, True, 4, 0.025, 0.8))
+
+# ALPHA = [2, 3, 4], BETA = 0.025, PTH = 0.9
+k_csqu_s29 = ('LEACH', None, 'zero', "k-CSqu", ("square", 3, True, 2, 0.025, 0.9))
+k_csqu_s39 = ('LEACH', None, 'zero', "k-CSqu", ("square", 3, True, 3, 0.025, 0.9))
+k_csqu_s49 = ('LEACH', None, 'zero', "k-CSqu", ("square", 3, True, 4, 0.025, 0.9))
 
 # k-InnRhom protocol of Irregular Hexagonal (Type 1) tessellation
-k_indi = ('LEACH', None, 'zero', "k-InDi", ("irrhex1", 3))
+k_indi = ('LEACH', None, 'zero', "k-InDi", ("irrhex1", 3, False, 0, 0, 0))
 
 # DIRACCk protocol of Reuleaux triangle tessellation
-diracck = ('LEACH', None, 'zero', "DIRACCk", ("triangle", 3))
+diracck = ('LEACH', None, 'zero', "DIRACCk", ("triangle", 3, False, 0, 0, 0))
+
+# ALPHA = [2, 3, 4], BETA = 0.025, PTH = 0.7
+diracck_s27 = ('LEACH', None, 'zero', "k-CSqu", ("triangle", 3, True, 2, 0.025, 0.7))
+diracck_s37 = ('LEACH', None, 'zero', "k-CSqu", ("triangle", 3, True, 3, 0.025, 0.7))
+diracck_s47 = ('LEACH', None, 'zero', "k-CSqu", ("triangle", 3, True, 4, 0.025, 0.7))
+
+# ALPHA = [2, 3, 4], BETA = 0.025, PTH = 0.8
+diracck_s28 = ('LEACH', None, 'zero', "k-CSqu", ("triangle", 3, True, 2, 0.025, 0.8))
+diracck_s38 = ('LEACH', None, 'zero', "k-CSqu", ("triangle", 3, True, 3, 0.025, 0.8))
+diracck_s48 = ('LEACH', None, 'zero', "k-CSqu", ("triangle", 3, True, 4, 0.025, 0.8))
+
+# ALPHA = [2, 3, 4], BETA = 0.025, PTH = 0.9
+diracck_s29 = ('LEACH', None, 'zero', "k-CSqu", ("triangle", 3, True, 2, 0.025, 0.9))
+diracck_s39 = ('LEACH', None, 'zero', "k-CSqu", ("triangle", 3, True, 3, 0.025, 0.9))
+diracck_s49 = ('LEACH', None, 'zero', "k-CSqu", ("triangle", 3, True, 4, 0.025, 0.9))
 
 scenarios = [
-    "plot_network(network)",
-    k_indi,
-    # k_csqu,
-    diracck,
+    # "plot_network(network)",
+    k_csqu_s27,
+    diracck_s27,
+    # k_csqu_s29,
+    # diracck_s29,
     "plot_traces(traces)",
 ]
 
@@ -168,12 +201,12 @@ TX_RANGE = 50  # meters
 BSID = -1
 
 # area definition
-AREA_WIDTH = 250.0
-AREA_LENGTH = 250.0
+AREA_WIDTH = 100.0
+AREA_LENGTH = 100.0
 
 # base station position
-BS_POS_X = 125.0
-BS_POS_Y = 125.0
+BS_POS_X = 50.0
+BS_POS_Y = 50.0
 
 # packet configs
 MSG_LENGTH = 4000  # bits

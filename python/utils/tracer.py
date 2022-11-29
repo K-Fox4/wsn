@@ -5,7 +5,7 @@ import config as cf
 
 class Tracer(dict):
     def __init__(self):
-        rounds_label = 'Rounds'
+        rounds_label = 'Time'
 
         # every tuple has a y-axis label, x-axis label, list with values,
         # boolean that indicates if it is plottable and if is printable
@@ -13,7 +13,7 @@ class Tracer(dict):
         # lifetime/energy-related log
         self['alive_nodes'] = ('Number of alive nodes', rounds_label, [], 1, 0)
         if cf.TRACE_ENERGY:
-            self['energies'] = ('Energy (J)', rounds_label, [], 1, 0)
+            self['energies'] = ('Remaining Energy (J)', rounds_label, [], 1, 0)
 
         self['first_depletion'] = ('First depletion', rounds_label, [], 0, 0)
         self['30per_depletion'] = ('30 percent depletion', rounds_label, [], 0, 0)
