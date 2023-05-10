@@ -3,4 +3,5 @@ from .tessellation import (
     ReuleauxTriangle,
     Square,
     IrregularHexagon1,
+    SlicedHexagon,
 )

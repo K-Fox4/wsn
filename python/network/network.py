@@ -105,8 +105,10 @@ class Network(list):
                     tessellation=tessellation
                 )
 
-            print(f"k-coverage scenario running is "
-                  f"{tessellation_protocol_map.get(k_coverage_approach[0])}")
+            protocol_name = tessellation_stochastic_protocol_map.get(k_coverage_approach[0]) if k_coverage_approach[2] \
+                else tessellation_protocol_map.get(k_coverage_approach[0])
+
+            print(f"k-coverage scenario running is {protocol_name}")
 
             self.round = round_nb
             current_remaining_energy = self.get_remaining_energy()

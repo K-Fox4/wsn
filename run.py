@@ -57,7 +57,7 @@ def run_scenarios():
         network.set_aggregation_function(eval(aggregation_function))
 
         logging.info(scenario_name + ': running scenario...')
-        traces[f"{scenario_name} {k_cov_scenario[0]}"] = network.simulate(k_coverage_approach=k_cov_scenario)
+        traces[f"{scenario_name} {k_cov_scenario[0]} {k_cov_scenario[2]}"] = network.simulate(k_coverage_approach=k_cov_scenario)
 
         remaining_energies.append(network.get_remaining_energy())
         average_energies.append(network.get_average_energy())

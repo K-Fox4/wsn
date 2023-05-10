@@ -17,10 +17,13 @@ def plot_lambda_vs_k(sensing_radius: int = 25, n: int = 5) -> None:
     excluded_total_coverage_area = (math.sqrt(3) * math.pow(sensing_radius, 2) * (
             (6 * math.pow(n, 2)) - (8 * n) + 2)) / (4 * math.pow(n, 2))
 
+    excluded_total_coverage_area = (math.sqrt(3) * math.pow(sensing_radius, 2) * (
+            (6 * math.pow(n, 2)) - (12 * n) + 4)) / (4 * math.pow(n, 2))
+
     grid = IrregularHexagon1(
         sensing_radius=sensing_radius,
         area_length=250,
-        factor=n
+        factor=3
     )
 
     theoretical = []
@@ -35,15 +38,15 @@ def plot_lambda_vs_k(sensing_radius: int = 25, n: int = 5) -> None:
     # Create plots
     fig, ax = plt.subplots()
     
-    plt.plot(k, theoretical, 'b-', marker='o', linewidth=3, markersize=12, label=r'$\lambda_{theo}$')
-    # plt.plot(k, excluded_theoretical, 'g-', marker='h', linewidth=3, markersize=12, label=r'$\lambda_{X-theo}$')
+    # plt.plot(k, theoretical, 'b-', marker='o', linewidth=3, markersize=12, label=r'$\lambda_{theo}$')
+    plt.plot(k, excluded_theoretical, 'g-', marker='h', linewidth=3, markersize=12, label=r'$\lambda_{theo}$')
     plt.plot(k, simulation, 'r-', marker='h', linewidth=3, markersize=12, label=r'$\lambda_{sim}$')
 
     ax.tick_params(axis='both', labelsize=14)
 
     plt.legend(fontsize=15)
 
-    plt.title(r'Sensing Radius $\it{r_s}$ = 25 m & $\it{n}$ = 5', fontsize=15, fontweight='bold')
+    plt.title(r'Sensing Radius $\it{r_s}$ = 25 m & $\it{n}$ = 3', fontsize=15, fontweight='bold')
     plt.xlabel(r'Degree of Coverage $(\it{k})$', fontsize=15, fontweight='bold')
     plt.ylabel(r'Planar Sensor Density $(\lambda)$', fontsize=15, fontweight='bold')
 
@@ -71,10 +74,13 @@ def plot_lambda_vs_rs(k: int = 3, n: int = 5) -> None:
         excluded_total_coverage_area = (math.sqrt(3) * math.pow(sensing_rad, 2) * (
                 (6 * math.pow(n, 2)) - (8 * n) + 2)) / (4 * math.pow(n, 2))
 
+        excluded_total_coverage_area = (math.sqrt(3) * math.pow(sensing_rad, 2) * (
+                (6 * math.pow(n, 2)) - (12 * n) + 4)) / (4 * math.pow(n, 2))
+
         grid = IrregularHexagon1(
             sensing_radius=sensing_rad,
             area_length=250,
-            factor=n
+            factor=3
         )
 
         theoretical.append(k / total_coverage_area)
@@ -84,15 +90,15 @@ def plot_lambda_vs_rs(k: int = 3, n: int = 5) -> None:
     # Create plots
     fig, ax = plt.subplots()
     
-    plt.plot(sensing_radius, theoretical, 'b-', marker='o', linewidth=3, markersize=12, label=r'$\lambda_{theo}$')
-    # plt.plot(sensing_radius, excluded_theoretical, 'g-', marker='h', linewidth=3, markersize=12, label=r'$\lambda_{X-theo}$')
+    # plt.plot(sensing_radius, theoretical, 'b-', marker='o', linewidth=3, markersize=12, label=r'$\lambda_{theo}$')
+    plt.plot(sensing_radius, excluded_theoretical, 'g-', marker='h', linewidth=3, markersize=12, label=r'$\lambda_{theo}$')
     plt.plot(sensing_radius, simulation, 'r-', marker='h', linewidth=3, markersize=12, label=r'$\lambda_{sim}$')
 
     ax.tick_params(axis='both', labelsize=14)
 
     plt.legend(fontsize=15)
 
-    plt.title(r'Degree of Coverage $\it{k}$ = 3 & $\it{n}$ = 5', fontsize=15, fontweight='bold')
+    plt.title(r'Degree of Coverage $\it{k}$ = 3 & $\it{n}$ = 3', fontsize=15, fontweight='bold')
     plt.xlabel(r'Sensing Radius $(\it{r_s})$', fontsize=15, fontweight='bold')
     plt.ylabel(r'Planar Sensor Density $(\lambda)$', fontsize=15, fontweight='bold')
 
@@ -103,7 +109,7 @@ def plot_lambda_vs_rs(k: int = 3, n: int = 5) -> None:
 
 
 def plot_lambda_vs_n(sensing_radius: int = 25, k: int = 5) -> None:
-    n = range(2, 10, 1)
+    n = range(3, 10, 1)
 
     theoretical = []
     simulation = []
@@ -120,6 +126,9 @@ def plot_lambda_vs_n(sensing_radius: int = 25, k: int = 5) -> None:
         excluded_total_coverage_area = (math.sqrt(3) * math.pow(sensing_radius, 2) * (
                 (6 * math.pow(n_val, 2)) - (8 * n_val) + 2)) / (4 * math.pow(n_val, 2))
 
+        excluded_total_coverage_area = (math.sqrt(3) * math.pow(sensing_radius, 2) * (
+                (6 * math.pow(n_val, 2)) - (12 * n_val) + 4)) / (4 * math.pow(n_val, 2))
+
         grid = IrregularHexagon1(
             sensing_radius=sensing_radius,
             area_length=250,
@@ -133,8 +142,8 @@ def plot_lambda_vs_n(sensing_radius: int = 25, k: int = 5) -> None:
     # Create plots
     fig, ax = plt.subplots()
     
-    plt.plot(n, theoretical, 'b-', marker='o', linewidth=3, markersize=12, label=r'$\lambda_{theo}$')
-    # plt.plot(n, excluded_theoretical, 'g-', marker='h', linewidth=3, markersize=12, label=r'$\lambda_{X-theo}$')
+    # plt.plot(n, theoretical, 'b-', marker='o', linewidth=3, markersize=12, label=r'$\lambda_{theo}$')
+    plt.plot(n, excluded_theoretical, 'g-', marker='h', linewidth=3, markersize=12, label=r'$\lambda_{theo}$')
     plt.plot(n, simulation, 'r-', marker='h', linewidth=3, markersize=12, label=r'$\lambda_{sim}$')
 
     ax.tick_params(axis='both', labelsize=14)
@@ -145,7 +154,7 @@ def plot_lambda_vs_n(sensing_radius: int = 25, k: int = 5) -> None:
     plt.xlabel(r'$\it{n}$', fontsize=15, fontweight='bold')
     plt.ylabel(r'Planar Sensor Density $(\lambda)$', fontsize=15, fontweight='bold')
 
-    plt.xlim(xmin=2, xmax=8)
+    plt.xlim(xmin=3, xmax=9)
     plt.ylim(ymin=0)
     plt.grid(b=True, which='major', color='0.6', linestyle='--')
     plt.show()
@@ -158,7 +167,7 @@ def plot_active_sens_vs_deployed_sens(sensing_radius: int = 25, n: int = 5) -> N
     grid = IrregularHexagon1(
         sensing_radius=sensing_radius,
         area_length=250,
-        factor=n
+        factor=3
     )
 
     active_sensors_3 = [grid.total_num_of_tiles * 3 for _ in range(len(deployed_sensors))]
@@ -175,7 +184,7 @@ def plot_active_sens_vs_deployed_sens(sensing_radius: int = 25, n: int = 5) -> N
     ax.tick_params(axis='y', labelsize=14)
 
     plt.legend(fontsize=15, loc='center right', bbox_to_anchor=(1, 0.7))
-    plt.title(r'Sensing Radius $\it{r_s}$ = 25 m & $\it{n}$ = 5', fontsize=15, fontweight='bold')
+    plt.title(r'Sensing Radius $\it{r_s}$ = 25 m & $\it{n}$ = 3', fontsize=15, fontweight='bold')
     plt.ylabel(r'Number of Active Sensors $(\it{n_a})$', fontsize=15, fontweight='bold')
     plt.xlabel(r'Number of Deployed Sensors $(\it{n_d})$', fontsize=15, fontweight='bold')
 
@@ -192,19 +201,19 @@ def plot_active_sens_vs_deployed_sens_2(k: int = 3, n: int = 5) -> None:
     grid_20 = IrregularHexagon1(
         sensing_radius=20,
         area_length=250,
-        factor=n
+        factor=3
     )
 
     grid_25 = IrregularHexagon1(
         sensing_radius=25,
         area_length=250,
-        factor=n
+        factor=3
     )
 
     grid_30 = IrregularHexagon1(
         sensing_radius=30,
         area_length=250,
-        factor=n
+        factor=3
     )
 
     active_sensors_20 = [grid_20.total_num_of_tiles * k for _ in range(len(deployed_sensors))]
@@ -221,7 +230,7 @@ def plot_active_sens_vs_deployed_sens_2(k: int = 3, n: int = 5) -> None:
     ax.tick_params(axis='y', labelsize=14)
 
     plt.legend(fontsize=15, loc='center right', bbox_to_anchor=(1, 0.7))
-    plt.title(r'Degree of Coverage $\it{k}$ = 3 & $\it{n}$ = 5', fontsize=15, fontweight='bold')
+    plt.title(r'Degree of Coverage $\it{k}$ = 3 & $\it{n}$ = 3', fontsize=15, fontweight='bold')
     plt.ylabel(r'Number of Active Sensors $(\it{n_a})$', fontsize=15, fontweight='bold')
     plt.xlabel(r'Number of Deployed Sensors $(\it{n_d})$', fontsize=15, fontweight='bold')
 
@@ -284,19 +293,19 @@ def plot_active_sensors_vs_k(n: int = 5):
     grid_20 = IrregularHexagon1(
         sensing_radius=20,
         area_length=250,
-        factor=n
+        factor=3
     )
 
     grid_25 = IrregularHexagon1(
         sensing_radius=25,
         area_length=250,
-        factor=n
+        factor=3
     )
 
     grid_30 = IrregularHexagon1(
         sensing_radius=30,
         area_length=250,
-        factor=n
+        factor=3
     )
 
     active_sensors_20 = []
@@ -318,7 +327,7 @@ def plot_active_sensors_vs_k(n: int = 5):
     ax.tick_params(axis='y', labelsize=14)
 
     plt.legend(fontsize=15, loc='lower right')
-    plt.title(r'$\it{n}$ = 5', fontsize=15, fontweight='bold')
+    plt.title(r'$\it{n}$ = 3', fontsize=15, fontweight='bold')
     plt.xlabel(r'Number of Active Sensors $(\it{n_a})$', fontsize=15, fontweight='bold')
     plt.ylabel(r'Degree of Coverage $(\it{k})$', fontsize=15, fontweight='bold')
 
@@ -387,7 +396,7 @@ def plot_lambda_vs_k_for_hexagon_and_triangle(sensing_radius: int = 25, n: int =
     hexagon_grid = IrregularHexagon1(
         sensing_radius=sensing_radius,
         area_length=250,
-        factor=n
+        factor=3
     )
 
     hexagon_simulation = []
@@ -412,7 +421,7 @@ def plot_lambda_vs_k_for_hexagon_and_triangle(sensing_radius: int = 25, n: int =
 
     plt.legend(fontsize=15)
 
-    plt.title(r'Sensing Radius $\it{r_s}$ = 25 m & $\it{n}$ = 5', fontsize=15, fontweight='bold')
+    plt.title(r'Sensing Radius $\it{r_s}$ = 25 m & $\it{n}$ = 3', fontsize=15, fontweight='bold')
     plt.xlabel(r'Degree of Coverage $(\it{k})$', fontsize=15, fontweight='bold')
     plt.ylabel(r'Planar Sensor Density $(\lambda)$', fontsize=15, fontweight='bold')
 
@@ -432,7 +441,7 @@ def plot_lambda_vs_rs_for_hexagon_and_triangle(k: int = 3, n: int = 5) -> None:
         hexagon_grid = IrregularHexagon1(
             sensing_radius=sensing_rad,
             area_length=250,
-            factor=n
+            factor=3
         )
 
         triangle_grid = ReuleauxTriangle(
@@ -453,7 +462,7 @@ def plot_lambda_vs_rs_for_hexagon_and_triangle(k: int = 3, n: int = 5) -> None:
 
     plt.legend(fontsize=15)
 
-    plt.title(r'Degree of Coverage $\it{k}$ = 3 & $\it{n}$ = 5', fontsize=15, fontweight='bold')
+    plt.title(r'Degree of Coverage $\it{k}$ = 3 & $\it{n}$ = 3', fontsize=15, fontweight='bold')
     plt.xlabel(r'Sensing Radius $(\it{r_s})$', fontsize=15, fontweight='bold')
     plt.ylabel(r'Planar Sensor Density $(\lambda)$', fontsize=15, fontweight='bold')
 
@@ -464,7 +473,7 @@ def plot_lambda_vs_rs_for_hexagon_and_triangle(k: int = 3, n: int = 5) -> None:
 
 
 def plot_lambda_vs_n_for_hexagon_and_triangle(sensing_radius: int = 25, k: int = 5) -> None:
-    n = range(2, 10, 1)
+    n = range(3, 10, 1)
 
     hexagon_simulation = []
 
@@ -500,7 +509,7 @@ def plot_lambda_vs_n_for_hexagon_and_triangle(sensing_radius: int = 25, k: int =
     plt.xlabel(r'$\it{n}$', fontsize=15, fontweight='bold')
     plt.ylabel(r'Planar Sensor Density $(\lambda)$', fontsize=15, fontweight='bold')
 
-    plt.xlim(xmin=2, xmax=9)
+    plt.xlim(xmin=3, xmax=9)
     plt.ylim(ymin=0)
     plt.grid(b=True, which='major', color='0.6', linestyle='--')
     plt.show()
@@ -513,7 +522,7 @@ def plot_active_sens_vs_deployed_sens_for_hexagon_vs_triangle(n: int = 5, sensin
     hexagon_grid = IrregularHexagon1(
         sensing_radius=sensing_radius,
         area_length=250,
-        factor=n
+        factor=3
     )
 
     hexagon_active_sensors = [hexagon_grid.total_num_of_tiles * k for _ in range(len(deployed_sensors))]
@@ -534,7 +543,7 @@ def plot_active_sens_vs_deployed_sens_for_hexagon_vs_triangle(n: int = 5, sensin
     ax.tick_params(axis='y', labelsize=14)
 
     plt.legend(fontsize=15, loc='center right')
-    plt.title(r'Sensing Radius $\it{r_s}$ = 25 m, Degree of Coverage $\it{k}$ = 3 & $\it{n}$ = 5', fontsize=15, fontweight='bold')
+    plt.title(r'Sensing Radius $\it{r_s}$ = 25 m, Degree of Coverage $\it{k}$ = 3 & $\it{n}$ = 3', fontsize=15, fontweight='bold')
     plt.ylabel(r'Number of Active Sensors $(\it{n_a})$', fontsize=15, fontweight='bold')
     plt.xlabel(r'Number of Deployed Sensors $(\it{n_d})$', fontsize=15, fontweight='bold')
 
@@ -551,7 +560,7 @@ def plot_active_sensors_vs_k_for_hexagon_vs_triangle(n: int = 5, sensing_radius:
     hexagon_grid = IrregularHexagon1(
         sensing_radius=sensing_radius,
         area_length=250,
-        factor=n
+        factor=3
     )
 
     triangle_grid = ReuleauxTriangle(
@@ -575,7 +584,7 @@ def plot_active_sensors_vs_k_for_hexagon_vs_triangle(n: int = 5, sensing_radius:
     ax.tick_params(axis='y', labelsize=14)
 
     plt.legend(fontsize=15)
-    plt.title(r'Sensing Radius $\it{r_s}$ = 25 m & $\it{n}$ = 5', fontsize=15, fontweight='bold')
+    plt.title(r'Sensing Radius $\it{r_s}$ = 25 m & $\it{n}$ = 3', fontsize=15, fontweight='bold')
     plt.xlabel(r'Number of Active Sensors $(\it{n_a})$', fontsize=15, fontweight='bold')
     plt.ylabel(r'Degree of Coverage $(\it{k})$', fontsize=15, fontweight='bold')
 
@@ -593,7 +602,7 @@ def plot_active_sens_vs_rc_for_hexagon_vs_triangle(n: int = 5, sensing_radius: i
     hexagon_grid = IrregularHexagon1(
         sensing_radius=sensing_radius,
         area_length=250,
-        factor=n
+        factor=3
     )
 
     hexagon_active_sensors_3 = [hexagon_grid.total_num_of_tiles * k for _ in range(len(rc))]
@@ -622,7 +631,7 @@ def plot_active_sens_vs_rc_for_hexagon_vs_triangle(n: int = 5, sensing_radius: i
     ax.tick_params(axis='y', labelsize=14)
 
     plt.legend(fontsize=15, loc='center right', bbox_to_anchor=(1, 0.7))
-    plt.title(r'Sensing Radius $\it{r_s}$ = 25 m & $\it{n}$ = 5', fontsize=15, fontweight='bold')
+    plt.title(r'Sensing Radius $\it{r_s}$ = 25 m & $\it{n}$ = 3', fontsize=15, fontweight='bold')
     plt.ylabel(r'Number of Active Sensors $(\it{n_a})$', fontsize=15, fontweight='bold')
     plt.xlabel(r'Communication Radius $(\it{r_c})$', fontsize=15, fontweight='bold')
 
@@ -648,7 +657,7 @@ def plot_active_sens_vs_rs_for_hexagon_vs_triangle(n: int = 5, k: int = 3) -> No
         hexagon_grid = IrregularHexagon1(
             sensing_radius=radius,
             area_length=250,
-            factor=n
+            factor=3
         )
 
         triangle_grid = ReuleauxTriangle(
@@ -677,7 +686,7 @@ def plot_active_sens_vs_rs_for_hexagon_vs_triangle(n: int = 5, k: int = 3) -> No
     ax.tick_params(axis='y', labelsize=14)
 
     plt.legend(fontsize=15, loc='center right')
-    plt.title(r'$\it{n}$ = 5', fontsize=15, fontweight='bold')
+    plt.title(r'$\it{n}$ = 3', fontsize=15, fontweight='bold')
     plt.ylabel(r'Number of Active Sensors $(\it{n_a})$', fontsize=15, fontweight='bold')
     plt.xlabel(r'Sensing Radius $(\it{r_s})$', fontsize=15, fontweight='bold')
 
@@ -691,7 +700,7 @@ def plot_active_sens_vs_rs_for_hexagon_vs_triangle(n: int = 5, k: int = 3) -> No
 if __name__ == "__main__":
     # plot_lambda_vs_k()
     # plot_lambda_vs_rs()
-    plot_lambda_vs_n()
+    # plot_lambda_vs_n()
     # plot_active_sens_vs_deployed_sens()
     # plot_active_sens_vs_deployed_sens_2()
     # plot_active_sens_vs_deployed_sens_3()
@@ -703,7 +712,7 @@ if __name__ == "__main__":
     # plot_active_sens_vs_deployed_sens_for_hexagon_vs_triangle()
     # plot_active_sensors_vs_k_for_hexagon_vs_triangle()
     # plot_active_sens_vs_rc_for_hexagon_vs_triangle()
-    # plot_active_sens_vs_rs_for_hexagon_vs_triangle()
+    plot_active_sens_vs_rs_for_hexagon_vs_triangle()
     # for n_val in range(2, 25):
     #     value = (
     #             math.pi +

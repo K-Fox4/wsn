@@ -18,6 +18,8 @@ class Tile(Polygon):
         result = None
         if self.tile_name == "irrhex1":
             result = round(0.5 * math.sqrt(3) * self.side, 2)
+        elif self.tile_name == "slhex":
+            result = round(self.side, 2)
         elif self.tile_name == "square":
             result = round(0.5 * math.sqrt(2 - math.sqrt(3)) * self.side, 2)
         elif self.tile_name == "triangle":
@@ -256,6 +258,7 @@ class Square(Tessellation):
 
         self.tile_name = "square"
         self.sensing_radius = sensing_radius
+        print(f"\nThe Sensing radius of the sensor is {self.sensing_radius}")
         self.tiles = self.get_tiles_info()
         self.total_num_of_tiles = len(self.tiles)
 
@@ -456,6 +459,201 @@ class IrregularHexagon1(Tessellation):
                         ))
 
                     # Selecting Irregular Hexagon using
+                    # bottom left vertex
+                    else:
+                        tiles.append(Tile(
+                            [self.points[ind_i][ind_j],
+                             self.points[ind_i][ind_j + 1],
+                             self.points[ind_i + 1][ind_j + 1],
+                             self.points[ind_i + 2][ind_j + 1],
+                             self.points[ind_i + 2][ind_j],
+                             self.points[ind_i + 1][ind_j]],
+                            self.tile_name,
+                            int(cf.COVERAGE_RADIUS) // self.factor
+                        ))
+
+        return tiles
+
+
+class SlicedHexagon(Tessellation):
+
+    def __init__(self, sensing_radius, area_length, factor=2):
+        super().__init__(area_length)
+
+        self.tile_name = "slhex"
+        self.sensing_radius = sensing_radius
+        self.factor = factor
+        self.points = self.get_all_points()
+        self.tiles = self.get_tiles_info()
+        self.total_num_of_tiles = len(self.tiles)
+
+    def calculate_x_iterations(self, extension_1, extension_2):
+        flag = True
+
+        count = 0
+        summation = 0
+
+        while summation < self.x_max:
+            if flag:
+                summation += extension_1
+                flag = False
+            else:
+                summation += extension_2
+                flag = True
+
+            count += 1
+
+        return count + 1
+
+    def calculate_y_iterations(self, extension):
+        flag = False
+        count = 0
+        summation = 0
+
+        while summation < self.y_max:
+            summation += extension
+
+            count += 1
+
+        if (count + 1) % 2 == 0:
+            count += 1
+        else:
+            flag = True
+
+        return count, flag
+
+    def get_all_points(self):
+        points = []
+
+        side = round(((self.factor - 1) * self.sensing_radius) / self.factor, 2)
+        x_ext_1 = 2 * side
+        x_ext_2 = side
+        x_iterations = self.calculate_x_iterations(
+            extension_1=x_ext_1,
+            extension_2=x_ext_2
+        )
+
+        y = 0
+        y_ext = round(0.5 * math.sqrt(3) * side, 2)
+        # y_iterations = 1 + math.ceil(self.y_max / y_ext)
+        y_iterations, flag = self.calculate_y_iterations(extension=y_ext)
+
+        for ind_i in range(y_iterations):
+
+            row = []
+            x = 0 if ind_i % 2 == 0 else (self.factor - 1) * 0.5 * side
+
+            for ind_j in range(x_iterations):
+
+                row.append((x, y))
+
+                # If the starting hexagon has a x
+                # coordinate as zero
+                if ind_i % 2 == 0:
+
+                    # Odd position x extension
+                    if ind_j % 2 == 0:
+                        x += x_ext_1
+
+                    # Even position x extension
+                    else:
+                        x += x_ext_2
+
+                # If the starting hexagon has a
+                # non-zero x coordinate
+                else:
+
+                    # Odd position x extension
+                    if ind_j % 2 == 0:
+                        x += x_ext_2
+
+                    # Even position x extension
+                    else:
+                        x += x_ext_1
+
+            # Add the points for this row
+            # to the collection of all
+            # points
+            points.append(row)
+
+            # Increment y
+            y += y_ext
+            y = round(y, 2)
+
+        return points
+
+    def get_tiles_info(self):
+        tiles = []
+        x_iterations = len(self.points[0]) - 1
+        y_iterations = len(self.points)
+
+        for ind_i in range(0, y_iterations, 2):
+
+            for ind_j in range(x_iterations):
+
+                # Combination of half and full
+                # Sliced hexagonal tiles
+                if ind_i == 0:
+
+                    # Half Sliced Hexagonal tile
+                    if ind_j % 2 == 0:
+                        tiles.append(Tile(
+                            [self.points[ind_i][ind_j],
+                             self.points[ind_i + 1][ind_j],
+                             self.points[ind_i + 1][ind_j + 1],
+                             self.points[ind_i][ind_j + 1]],
+                            self.tile_name,
+                            int(cf.COVERAGE_RADIUS) // self.factor
+                        ))
+
+                    # Full Sliced Hexagonal tile
+                    else:
+                        tiles.append(Tile(
+                            [self.points[ind_i][ind_j],
+                             self.points[ind_i][ind_j + 1],
+                             self.points[ind_i + 1][ind_j + 1],
+                             self.points[ind_i + 2][ind_j + 1],
+                             self.points[ind_i + 2][ind_j],
+                             self.points[ind_i + 1][ind_j]],
+                            self.tile_name,
+                            int(cf.COVERAGE_RADIUS) // self.factor
+                        ))
+
+                # Uniform gap between the consecutive
+                # Sliced hexagonal tiles
+                elif ind_i == y_iterations - 2:
+
+                    # Generating tile with uniform gaps
+                    if ind_j % 2 == 0:
+                        tiles.append(Tile(
+                            [self.points[ind_i][ind_j],
+                             self.points[ind_i - 1][ind_j],
+                             self.points[ind_i - 1][ind_j + 1],
+                             self.points[ind_i][ind_j + 1],
+                             self.points[ind_i + 1][ind_j + 1],
+                             self.points[ind_i + 1][ind_j]],
+                            self.tile_name,
+                            int(cf.COVERAGE_RADIUS) // self.factor
+                        ))
+
+                # Continuous Sliced Hexagonal tiles
+                else:
+
+                    # Selecting Sliced Hexagon using
+                    # middle left vertex
+                    if ind_j % 2 == 0:
+                        tiles.append(Tile(
+                            [self.points[ind_i][ind_j],
+                             self.points[ind_i - 1][ind_j],
+                             self.points[ind_i - 1][ind_j + 1],
+                             self.points[ind_i][ind_j + 1],
+                             self.points[ind_i + 1][ind_j + 1],
+                             self.points[ind_i + 1][ind_j]],
+                            self.tile_name,
+                            int(cf.COVERAGE_RADIUS) // self.factor
+                        ))
+
+                    # Selecting Sliced Hexagon using
                     # bottom left vertex
                     else:
                         tiles.append(Tile(

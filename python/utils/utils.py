@@ -138,6 +138,11 @@ def plot_traces(traces):
         scenario_strings = scenario.split(" ")
         label_str = tessellation_protocol_label_map.get(scenario_strings[1], scenario_strings[0])
 
+        # if bool(scenario_strings[2]):
+        #     label_str = tessellation_stochastic_protocol_label_map.get(scenario_strings[1], scenario_strings[0])
+        # else:
+        #     label_str = tessellation_protocol_label_map.get(scenario_strings[1], scenario_strings[0])
+
         subplot_idx = 1
         for trace_name, trace in tracer.items():
             if not trace[3]:
@@ -145,17 +150,21 @@ def plot_traces(traces):
             ax = plt.subplot(1, nb_columns, subplot_idx)
             # ax.set_title(trace_name)
             X = range(0, len(trace[2]))
+            print(f"Values of {trace[0]}: {trace[2]}")
             color_n_line = colors[color_idx] + line_style[line_idx]
             plt.plot(X, trace[2], color_n_line, label=label_str, linewidth=3)
 
             # plt.title(r'$\it{r_s}$ = 25 m & $\it{k}$ = 3', fontsize=15, fontweight='bold')
-            plt.xlabel(trace[1], fontsize=15, fontweight='bold')
-            plt.ylabel(trace[0], fontsize=15, fontweight='bold')
+            plt.xlabel(trace[1], fontsize=20, fontweight='bold')
+            plt.ylabel(trace[0], fontsize=20, fontweight='bold')
+
+            ax.tick_params(axis='x', labelsize=20)
+            ax.tick_params(axis='y', labelsize=20)
 
             plt.xlim(xmin=0)
             plt.ylim(ymin=0)
             plt.grid(b=True, which='major', color='0.6', linestyle='--')
-            plt.legend(fontsize=15)
+            plt.legend(fontsize=20)
             subplot_idx += 1
         color_idx = (color_idx + 1) % len(colors)
         line_idx = (line_idx + 1) % len(line_style)
